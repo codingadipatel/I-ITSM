@@ -1,0 +1,200 @@
+@startuml
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam defaultFontName SansSerif
+skinparam defaultFontSize 14
+skinparam classFontSize 16
+skinparam classAttributeFontSize 13
+skinparam classBorderColor #69839D
+skinparam ArrowColor #526B83
+skinparam packageBorderColor #B4C2CF
+skinparam packageBackgroundColor #FAFCFE
+skinparam classAttributeIconSize 0
+skinparam linetype polyline
+skinparam nodesep 35
+skinparam ranksep 55
+hide empty members
+
+title I-ITSM | Incident orchestration, querying and monitoring
+caption Source snapshot: 22 November 2026 | com.iitsm backend | Explicit members; generated accessors omitted
+package "entity" {
+class "Incident" as Incident <<JPA entity>> #EAF4FF {
+}
+}
+package "observer" {
+class "IncidentEventPublisher" as IncidentEventPublisher #E3F5EC {
+}
+}
+package "repository" {
+interface "DuplicateSuggestionRepository" as DuplicateSuggestionRepository #EAF4EE {
+}
+interface "FeedbackRepository" as FeedbackRepository #EAF4EE {
+}
+interface "IncidentCategoryRepository" as IncidentCategoryRepository #EAF4EE {
+}
+interface "IncidentNoteRepository" as IncidentNoteRepository #EAF4EE {
+}
+interface "IncidentRepository" as IncidentRepository #EAF4EE {
+}
+interface "ServiceItemRepository" as ServiceItemRepository #EAF4EE {
+}
+interface "TechnicianRepository" as TechnicianRepository #EAF4EE {
+}
+interface "UserRepository" as UserRepository #EAF4EE {
+}
+}
+package "security" {
+class "AccessService" as AccessService #FCE8EC {
+}
+}
+package "service" {
+class "AssignmentService" as AssignmentService #F0F5F9 {
+}
+class "DuplicateDetectionService" as DuplicateDetectionService #F0F5F9 {
+ -incidents : IncidentRepository
+ -duplicates : DuplicateSuggestionRepository
+ --
+ {static} +similarity(a: String, b: String) : double
+ {static} -tokens(text: String) : Set<String>
+ +detect(i: Incident) : void
+}
+class "IncidentEmailService" as IncidentEmailService #F0F5F9 {
+}
+class "IncidentQueryService" as IncidentQueryService #F0F5F9 {
+ -incidents : IncidentRepository
+ -notes : IncidentNoteRepository
+ -audits : AuditLogRepository
+ -duplicates : DuplicateSuggestionRepository
+ -feedback : FeedbackRepository
+ -access : AccessService
+ -mapper : ViewMapper
+ --
+ +find(id: Long) : Incident
+ {static} +visible(u: User) : Specification<Incident>
+ -filters(f: Map<String, String>) : Specification<Incident>
+ +export(f: Map<String, String>) : List<IncidentView>
+ +search(f: Map<String, String>, page: int, size: int) : Page<IncidentView>
+ +detail(id: Long) : DetailView
+}
+class "IncidentService" as IncidentService #F0F5F9 {
+ -incidents : IncidentRepository
+ -services : ServiceItemRepository
+ -categories : IncidentCategoryRepository
+ -notes : IncidentNoteRepository
+ -feedback : FeedbackRepository
+ -duplicates : DuplicateSuggestionRepository
+ -access : AccessService
+ -priority : PriorityCalculationService
+ -assignment : AssignmentService
+ -detector : DuplicateDetectionService
+ -events : IncidentEventPublisher
+ -states : StateRegistry
+ --
+ -locked(id: Long) : Incident
+ -service(id: Long) : ServiceItem
+ -category(id: Long) : IncidentCategory
+ -event(i: Incident, actor: User, action: String, before: String, details: String) : void
+ +create(r: IncidentInput) : Incident
+ +update(id: Long, r: IncidentInput) : Incident
+ +assign(id: Long, r: Assign) : Incident
+ +transition(id: Long, action: String, details: String) : Incident
+ +note(id: Long, r: Detail, request: boolean) : void
+ +feedback(id: Long, r: Rating) : void
+ +review(id: Long, suggestionId: Long, decision: String) : void
+}
+class "PriorityCalculationService" as PriorityCalculationService #F0F5F9 {
+}
+class "ReportService" as ReportService #F0F5F9 {
+ -incidents : IncidentRepository
+ -technicians : TechnicianRepository
+ -access : AccessService
+ -assignments : AssignmentService
+ --
+ -visible() : List<Incident>
+ +comparison(period: String, date: LocalDate) : Comparison
+ +overview() : Map<String, Object>
+ -group(list: List<Incident>, key: Function<Incident, String>) : List<Map<String, Object>>
+ +category() : List<Map<String, Object>>
+ +service() : List<Map<String, Object>>
+ +trends() : List<Map<String, Object>>
+ +workload() : List<Map<String, Object>>
+}
+class "ReportService.Comparison" as ReportService_Comparison <<record>> #F0F5F9 {
+ -previousStart : LocalDate
+ -selectedStart : LocalDate
+ -endExclusive : LocalDate
+ -total : Counts
+ -technicians : List<TechnicianCounts>
+}
+class "ReportService.Counts" as ReportService_Counts <<record>> #F0F5F9 {
+ -previous : long
+ -selected : long
+ --
+ ~add(current: boolean) : Counts
+}
+class "ReportService.TechnicianCounts" as ReportService_TechnicianCounts <<record>> #F0F5F9 {
+ -id : Long
+ -name : String
+ -counts : Counts
+}
+class "SlaMonitoringService" as SlaMonitoringService #F0F5F9 {
+ -incidents : IncidentRepository
+ -events : IncidentEventPublisher
+ -email : IncidentEmailService
+ --
+ +scan() : void
+ +scanAt(now: Instant) : void
+}
+}
+package "state" {
+class "StateRegistry" as StateRegistry #EDE9FC {
+}
+}
+AccessService --> UserRepository : users
+AssignmentService --> TechnicianRepository : technicians
+AssignmentService --> IncidentRepository : incidents
+AssignmentService --> IncidentEventPublisher : events
+AssignmentService --> StateRegistry : states
+DuplicateDetectionService --> IncidentRepository : incidents
+DuplicateDetectionService --> DuplicateSuggestionRepository : duplicates
+IncidentQueryService --> IncidentRepository : incidents
+IncidentQueryService --> IncidentNoteRepository : notes
+IncidentQueryService --> DuplicateSuggestionRepository : duplicates
+IncidentQueryService --> FeedbackRepository : feedback
+IncidentQueryService --> AccessService : access
+IncidentService --> IncidentRepository : incidents
+IncidentService --> ServiceItemRepository : services
+IncidentService --> IncidentCategoryRepository : categories
+IncidentService --> IncidentNoteRepository : notes
+IncidentService --> FeedbackRepository : feedback
+IncidentService --> DuplicateSuggestionRepository : duplicates
+IncidentService --> AccessService : access
+IncidentService --> PriorityCalculationService : priority
+IncidentService --> AssignmentService : assignment
+IncidentService --> DuplicateDetectionService : detector
+IncidentService --> IncidentEventPublisher : events
+IncidentService --> StateRegistry : states
+ReportService --> IncidentRepository : incidents
+ReportService --> TechnicianRepository : technicians
+ReportService --> AccessService : access
+ReportService --> AssignmentService : assignments
+ReportService_TechnicianCounts --> ReportService_Counts : counts
+ReportService_Comparison --> ReportService_Counts : total
+ReportService_Comparison --> ReportService_TechnicianCounts : technicians
+SlaMonitoringService --> IncidentRepository : incidents
+SlaMonitoringService --> IncidentEventPublisher : events
+SlaMonitoringService --> IncidentEmailService : email
+IncidentRepository ..> Incident : persists
+legend bottom left
+DESIGN NOTES
+Controllers delegate to services. Transactions coordinate domain changes, persistence and events.
+Duplicate detection is explainable similarity over recent persisted incident records.
+Context classes are shown as names; their full details appear on other sheets.
+
+NOTATION
++ public   # protected   - private   ~ package
+Solid hollow triangle: inheritance | Dashed hollow triangle: interface realization
+Filled diamond: composition | Hollow diamond: shared aggregation
+Arrow: stored association | Dashed arrow: dependency
+endlegend
+@enduml

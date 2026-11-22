@@ -1,0 +1,161 @@
+@startuml
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam defaultFontName SansSerif
+skinparam defaultFontSize 14
+skinparam classFontSize 16
+skinparam classAttributeFontSize 13
+skinparam classBorderColor #69839D
+skinparam ArrowColor #526B83
+skinparam packageBorderColor #B4C2CF
+skinparam packageBackgroundColor #FAFCFE
+skinparam classAttributeIconSize 0
+skinparam linetype polyline
+skinparam nodesep 35
+skinparam ranksep 55
+hide empty members
+
+title I-ITSM | Incident history, collaboration and supporting records
+caption Source snapshot: 22 November 2026 | com.iitsm backend | Explicit members; generated accessors omitted
+package "entity" {
+class "Assignment" as Assignment <<JPA entity>> #EAF4FF {
+ -id : Long
+ -incident : Incident
+ -technician : Technician
+ -assignedBy : User
+ -reason : String
+ -createdAt : Instant
+}
+class "AuditLog" as AuditLog <<JPA entity>> #EAF4FF {
+ -id : Long
+ -incident : Incident
+ -actor : User
+ -action : String
+ -previousState : String
+ -newState : String
+ -description : String
+ -createdAt : Instant
+}
+class "DuplicateSuggestion" as DuplicateSuggestion <<JPA entity>> #EAF4FF {
+ -id : Long
+ -incident : Incident
+ -related : Incident
+ -score : double
+ -decision : String
+ -reviewedBy : User
+ -reviewedAt : Instant
+ --
+ +review(user: User, decision: String) : void
+}
+class "EmailMessage" as EmailMessage <<JPA entity>> #EAF4FF {
+ -id : Long
+ -recipient : String
+ -subject : String
+ -body : String
+ -deliveryStatus : String
+ -createdAt : Instant
+ -sentAt : Instant
+}
+class "Feedback" as Feedback <<JPA entity>> #EAF4FF {
+ -id : Long
+ -incident : Incident
+ -rating : int
+ -comment : String
+ -createdAt : Instant
+}
+class "Incident" as Incident <<JPA entity>> #EAF4FF {
+}
+class "IncidentNote" as IncidentNote <<JPA entity>> #EAF4FF {
+ -id : Long
+ -incident : Incident
+ -author : User
+ -content : String
+ -informationRequest : boolean
+ -createdAt : Instant
+}
+class "Notification" as Notification <<JPA entity>> #EAF4FF {
+ -id : Long
+ -recipient : User
+ -incident : Incident
+ -eventType : String
+ -message : String
+ -read : boolean
+ -createdAt : Instant
+ --
+ +markRead() : void
+}
+class "Technician" as Technician <<JPA entity>> #EAF4FF {
+}
+abstract class "User" as User <<JPA entity>> #EAF4FF {
+}
+}
+package "observer" {
+class "InAppNotificationChannel" as InAppNotificationChannel #E3F5EC {
+}
+}
+package "repository" {
+interface "IncidentRepository" as IncidentRepository #EAF4EE {
+}
+}
+package "security" {
+class "AccessService" as AccessService #FCE8EC {
+}
+}
+package "service" {
+class "IncidentChatService" as IncidentChatService #F0F5F9 {
+ -incidents : IncidentRepository
+ -access : AccessService
+ -db : JdbcTemplate
+ -notifications : InAppNotificationChannel
+ --
+ -partner(incident: Incident, actor: User) : User
+ +conversation(incident: Incident, actor: User) : NotificationConversation
+ -requireParticipant(incident: Incident, actor: User) : User
+ +messages(id: long, expectedTechnicianId: long) : List<Message>
+ +send(id: long, expectedTechnicianId: long, body: String, sourceNotificationId: Long) : void
+}
+class "IncidentChatService.Message" as IncidentChatService_Message <<record>> #F0F5F9 {
+ -id : long
+ -senderId : long
+ -sender : String
+ -body : String
+ -sentAt : Instant
+ -notificationReply : boolean
+}
+}
+User <|-- Technician
+IncidentChatService --> IncidentRepository : incidents
+IncidentChatService --> AccessService : access
+IncidentChatService --> InAppNotificationChannel : notifications
+Incident "0..*" --> "1" User : reporter
+Incident "0..*" --> "0..1" Technician : technician
+Assignment "0..*" --> "0..1" Incident : incident
+Assignment "0..*" --> "0..1" Technician : technician
+Assignment "0..*" --> "0..1" User : assignedBy
+IncidentNote "0..*" --> "1" Incident : incident
+IncidentNote "0..*" --> "1" User : author
+AuditLog "0..*" --> "0..1" Incident : incident
+AuditLog "0..*" --> "0..1" User : actor
+Feedback "0..1" --> "1" Incident : incident
+DuplicateSuggestion "0..*" --> "0..1" Incident : incident
+DuplicateSuggestion "0..*" --> "0..1" Incident : related
+DuplicateSuggestion "0..*" --> "0..1" User : reviewedBy
+Notification "0..*" --> "1" User : recipient
+Notification "0..*" --> "0..1" Incident : incident
+IncidentRepository ..> Incident : persists
+InAppNotificationChannel ..> User : uses
+InAppNotificationChannel ..> Incident : uses
+legend bottom left
+DESIGN NOTES
+Chat uses JdbcTemplate and incident_chat_messages; there is no ChatMessage JPA entity.
+IncidentNote covers notes and information requests. AuditLog is the history entity.
+EmailMessage stores a recipient string, not a User foreign key.
+Nullable multiplicities follow JPA optional defaults; services enforce stronger business rules.
+
+NOTATION
++ public   # protected   - private   ~ package
+Solid hollow triangle: inheritance | Dashed hollow triangle: interface realization
+Filled diamond: composition | Hollow diamond: shared aggregation
+Arrow: stored association | Dashed arrow: dependency
+endlegend
+@enduml

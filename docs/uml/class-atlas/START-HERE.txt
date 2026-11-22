@@ -1,0 +1,56 @@
+I-ITSM COMPLETE UML CLASS DIAGRAMS
+Source snapshot: 22 November 2026
+
+OPEN FIRST: I-ITSM-Complete-UML.pdf (guide plus 12 vector diagram pages).
+ONE LARGE DIAGRAM: 00-complete-project.svg (all 139 declared types).
+PRESENTATION: 01-incident-users.svg, 03-strategies.svg, 04-state-lifecycle.svg.
+Editable sources: every .puml has a matching .svg. Key diagrams also include PNG previews.
+
+COVERAGE
+107 Java files; 139 declared types, including 32 nested types.
+All production types are detailed on at least one numbered sheet.
+Constructors, Lombok-generated getters/constructors and implicit record accessors are omitted.
+Explicitly written getters and private helper operations are retained.
+JDK/Spring classes are external dependencies: shown in member types or inheritance notes.
+Frontend functional components, tests and database tables without Java types are outside the class inventory.
+
+CORRECT INTERPRETATION
+- Administrator is the Java class for the ADMIN role; User is abstract.
+- User roles use SINGLE_TABLE inheritance. Technician has shared Skill entities.
+- Incident has one reporter, an optional assigned Technician, service/category and embedded SlaTracking.
+- Nullable JPA relationships retain 0..1 notation; normal service operations impose stronger rules.
+- PriorityStrategy and TechnicianAssignmentStrategy are separate interfaces. No IncidentStrategy class exists.
+- StateRegistry selects IncidentState objects; IncidentService enforces actor permissions.
+- IncidentEmailService is an event listener. SMTP delivery is performed by SmtpOutboxService.
+- Chat is persisted through JdbcTemplate; IncidentChatService.Message is a record, not a JPA entity.
+- EmailMessage is a projection of selected outbox fields; worker SQL also manages attempts and expiry.
+- No obsolete NotificationFactory or SimulatedEmailChannel is included.
+
+LEGEND
++ public; # protected; - private; ~ package visibility.
+Hollow triangle: inheritance; dashed hollow triangle: interface realization.
+Filled diamond: composition; hollow diamond: shared aggregation.
+Solid arrow: stored association; dashed arrow: dependency.
+Record components are represented as private final data; generated accessors are omitted.
+
+SOURCE TRACEABILITY
+class-inventory.json maps each type to its actual Java source file and sheet.
+source-manifest.json records SHA-256 checksums for the source snapshot.
+
+RENDER EDITS
+java -Djava.awt.headless=true -DPLANTUML_LIMIT_SIZE=30000 -jar /path/to/plantuml.jar -tsvg *.puml
+Graphviz dot is used for layout. No secrets or runtime database files are included.
+
+SHEETS
+01-incident-users : Incident, users and SLA - core domain
+02-incident-history : Incident history, collaboration and supporting records
+03-strategies : Priority and technician assignment strategies
+04-state-lifecycle : State pattern and legal incident transitions
+05-events-email : Events, notifications, SMTP and scheduling
+06-incident-services : Incident orchestration, querying and monitoring
+07-account-services : User management, authentication and configuration
+08-api-security : REST controllers and security
+09-repositories : All Spring Data repository interfaces
+10-request-models : Validated request DTOs
+11-response-models : Response DTOs and view composition
+12-infrastructure-errors : Exception hierarchy, application and demo initialization

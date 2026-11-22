@@ -1,0 +1,113 @@
+@startuml
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam defaultFontName SansSerif
+skinparam defaultFontSize 14
+skinparam classFontSize 16
+skinparam classAttributeFontSize 13
+skinparam classBorderColor #69839D
+skinparam ArrowColor #526B83
+skinparam packageBorderColor #B4C2CF
+skinparam packageBackgroundColor #FAFCFE
+skinparam classAttributeIconSize 0
+skinparam linetype polyline
+skinparam nodesep 35
+skinparam ranksep 55
+hide empty members
+
+title I-ITSM | Validated request DTOs
+caption Source snapshot: 22 November 2026 | com.iitsm backend | Explicit members; generated accessors omitted
+package "dto" {
+class "Requests" as Requests #F0EDFA {
+}
+class "Requests.Assign" as Requests_Assign <<record>> #F0EDFA {
+ -technicianId : Long
+ -reason : String
+}
+class "Requests.CatalogInput" as Requests_CatalogInput <<record>> #F0EDFA {
+ -name : String
+ -active : boolean
+ -criticality : int
+ -requiredSkill : String
+}
+class "Requests.ChatMessage" as Requests_ChatMessage <<record>> #F0EDFA {
+ -technicianId : long
+ -body : String
+}
+class "Requests.Decision" as Requests_Decision <<record>> #F0EDFA {
+ -decision : String
+}
+class "Requests.Detail" as Requests_Detail <<record>> #F0EDFA {
+ -details : String
+}
+class "Requests.IncidentInput" as Requests_IncidentInput <<record>> #F0EDFA {
+ -title : String
+ -description : String
+ -serviceId : Long
+ -categoryId : Long
+ -impact : int
+ -urgency : int
+ -affectedUsers : int
+}
+class "Requests.Login" as Requests_Login <<record>> #F0EDFA {
+ -email : String
+ -password : String
+}
+class "Requests.Policy" as Requests_Policy <<record>> #F0EDFA {
+ -priority : Priority
+ -responseMinutes : int
+ -resolutionMinutes : int
+}
+class "Requests.Profile" as Requests_Profile <<record>> #F0EDFA {
+ -name : String
+}
+class "Requests.Rating" as Requests_Rating <<record>> #F0EDFA {
+ -rating : int
+ -comment : String
+}
+class "Requests.Register" as Requests_Register <<record>> #F0EDFA {
+ -name : String
+ -email : String
+ -password : String
+}
+class "Requests.Settings" as Requests_Settings <<record>> #F0EDFA {
+ -assignmentStrategy : String
+ -priorityStrategy : String
+ -p1Threshold : double
+ -p2Threshold : double
+ -p3Threshold : double
+ -emailEnabled : boolean
+}
+class "Requests.UserInput" as Requests_UserInput <<record>> #F0EDFA {
+ -name : String
+ -email : String
+ -password : String
+ -role : Role
+ -active : boolean
+ -available : boolean
+ -maxWorkload : int
+ -experienceYears : int
+ -skills : Set<@NotBlank @Size(max = 80) String>
+}
+}
+package "model" {
+enum "Priority" as Priority #EDF2F7 {
+}
+enum "Role" as Role #EDF2F7 {
+}
+}
+Requests_UserInput --> Role : role
+Requests_Policy --> Priority : priority
+legend bottom left
+DESIGN NOTES
+Records are immutable transport values; validation annotations remain in Java source.
+Record components have generated public accessors; displayed fields represent components.
+DTO containers Requests and Views group nested records; they are not persisted entities.
+
+NOTATION
++ public   # protected   - private   ~ package
+Solid hollow triangle: inheritance | Dashed hollow triangle: interface realization
+Filled diamond: composition | Hollow diamond: shared aggregation
+Arrow: stored association | Dashed arrow: dependency
+endlegend
+@enduml

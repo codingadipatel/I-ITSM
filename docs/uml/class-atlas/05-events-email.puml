@@ -1,0 +1,170 @@
+@startuml
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam defaultFontName SansSerif
+skinparam defaultFontSize 14
+skinparam classFontSize 16
+skinparam classAttributeFontSize 13
+skinparam classBorderColor #69839D
+skinparam ArrowColor #526B83
+skinparam packageBorderColor #B4C2CF
+skinparam packageBackgroundColor #FAFCFE
+skinparam classAttributeIconSize 0
+skinparam linetype polyline
+skinparam nodesep 35
+skinparam ranksep 55
+hide empty members
+
+title I-ITSM | Events, notifications, SMTP and scheduling
+caption Source snapshot: 22 November 2026 | com.iitsm backend | Explicit members; generated accessors omitted
+package "entity" {
+class "Incident" as Incident <<JPA entity>> #EAF4FF {
+}
+abstract class "User" as User <<JPA entity>> #EAF4FF {
+}
+}
+package "model" {
+enum "Status" as Status #EDF2F7 {
+}
+}
+package "observer" {
+class "AuditObserver" as AuditObserver #E3F5EC {
+ -repository : AuditLogRepository
+ --
+ +onEvent(e: IncidentEvent) : void
+}
+class "InAppNotificationChannel" as InAppNotificationChannel #E3F5EC {
+ -repository : NotificationRepository
+ --
+ +deliver(u: User, i: Incident, t: String, m: String) : void
+}
+class "IncidentEvent" as IncidentEvent <<record>> #E3F5EC {
+ -incident : Incident
+ -actor : User
+ -action : String
+ -previousState : String
+ -newState : String
+ -description : String
+ -statusBefore : Status
+ -statusAfter : Status
+ --
+ +statusChanged() : boolean
+}
+interface "IncidentEventListener" as IncidentEventListener #E3F5EC {
+ +onEvent(event: IncidentEvent) : void
+}
+class "IncidentEventPublisher" as IncidentEventPublisher #E3F5EC {
+ -observers : List<IncidentEventListener>
+ --
+ +publish(e: IncidentEvent) : void
+}
+interface "NotificationChannel" as NotificationChannel #E3F5EC {
+ +deliver(recipient: User, incident: Incident, type: String, message: String) : void
+}
+class "NotificationObserver" as NotificationObserver #E3F5EC {
+ -inApp : InAppNotificationChannel
+ -users : UserRepository
+ --
+ +onEvent(e: IncidentEvent) : void
+}
+}
+package "repository" {
+interface "AuditLogRepository" as AuditLogRepository #EAF4EE {
+}
+interface "NotificationRepository" as NotificationRepository #EAF4EE {
+}
+interface "SystemSettingsRepository" as SystemSettingsRepository #EAF4EE {
+}
+interface "UserRepository" as UserRepository #EAF4EE {
+}
+}
+package "scheduler" {
+class "EmailScheduler" as EmailScheduler #E3F5EC {
+ -outbox : SmtpOutboxService
+ -configured : boolean
+ --
+ +sendPendingEmail() : void
+}
+class "SlaScheduler" as SlaScheduler #E3F5EC {
+ -monitor : SlaMonitoringService
+ --
+ +monitor() : void
+}
+}
+package "service" {
+class "IncidentEmailService" as IncidentEmailService #F0F5F9 {
+ -db : JdbcTemplate
+ -settings : SystemSettingsRepository
+ -recipientOverrides : Map<String, String>
+ --
+ +enabled() : boolean
+ +onEvent(event: IncidentEvent) : void
+ +queueSlaReminders(incident: Incident, now: Instant) : void
+ -queueMilestones(incident: Incident, technician: User, clock: String, deadline: Instant, now: Instant) : void
+ -queue(recipient: User, subject: String, body: String, key: String, expiresAt: Instant) : void
+ {static} -label(status: Status) : String
+}
+class "SlaMonitoringService" as SlaMonitoringService #F0F5F9 {
+}
+class "SmtpOutboxService" as SmtpOutboxService #F0F5F9 {
+ {static} -log : Logger
+ {static} -MAX_ATTEMPTS : int
+ -db : JdbcTemplate
+ -sender : JavaMailSender
+ -from : String
+ --
+ +deliverNext() : boolean
+}
+class "SmtpOutboxService.Pending" as SmtpOutboxService_Pending <<record>> #F0F5F9 {
+ -id : long
+ -recipient : String
+ -subject : String
+ -body : String
+ -attempts : int
+ -expired : boolean
+}
+}
+Incident --> Status : status
+IncidentEventListener <|.. AuditObserver
+AuditObserver --> AuditLogRepository : repository
+NotificationChannel <|.. InAppNotificationChannel
+InAppNotificationChannel --> NotificationRepository : repository
+IncidentEvent --> Incident : incident
+IncidentEvent --> User : actor
+IncidentEvent --> Status : statusBefore
+IncidentEvent --> Status : statusAfter
+IncidentEventListener <|.. NotificationObserver
+NotificationObserver --> InAppNotificationChannel : inApp
+NotificationObserver --> UserRepository : users
+EmailScheduler --> SmtpOutboxService : outbox
+SlaScheduler --> SlaMonitoringService : monitor
+IncidentEventListener <|.. IncidentEmailService
+IncidentEmailService --> SystemSettingsRepository : settings
+SlaMonitoringService --> IncidentEventPublisher : events
+SlaMonitoringService --> IncidentEmailService : email
+Incident "0..*" --> "1" User : reporter
+IncidentEventPublisher ..> IncidentEvent : publishes
+UserRepository ..> User : persists
+AuditObserver ..> IncidentEvent : uses
+InAppNotificationChannel ..> User : uses
+InAppNotificationChannel ..> Incident : uses
+IncidentEventListener ..> IncidentEvent : uses
+IncidentEventPublisher ..> IncidentEvent : uses
+NotificationChannel ..> User : uses
+NotificationChannel ..> Incident : uses
+NotificationObserver ..> IncidentEvent : uses
+IncidentEventPublisher "1" o-- "0..*" IncidentEventListener : observers
+legend bottom left
+DESIGN NOTES
+IncidentEmailService implements IncidentEventListener and writes the durable email outbox.
+SmtpOutboxService sends through JavaMailSender; it is not a NotificationChannel implementation.
+Recipient overrides redirect outgoing mail while retaining account login addresses.
+Expired reminders are not delivered; SMTP failures retry with a bounded attempt count.
+
+NOTATION
++ public   # protected   - private   ~ package
+Solid hollow triangle: inheritance | Dashed hollow triangle: interface realization
+Filled diamond: composition | Hollow diamond: shared aggregation
+Arrow: stored association | Dashed arrow: dependency
+endlegend
+@enduml

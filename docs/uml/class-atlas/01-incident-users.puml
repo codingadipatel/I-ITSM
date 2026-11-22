@@ -1,0 +1,198 @@
+@startuml
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam defaultFontName SansSerif
+skinparam defaultFontSize 14
+skinparam classFontSize 16
+skinparam classAttributeFontSize 13
+skinparam classBorderColor #69839D
+skinparam ArrowColor #526B83
+skinparam packageBorderColor #B4C2CF
+skinparam packageBackgroundColor #FAFCFE
+skinparam classAttributeIconSize 0
+skinparam linetype polyline
+skinparam nodesep 35
+skinparam ranksep 55
+hide empty members
+
+title I-ITSM | Incident, users and SLA - core domain
+caption Source snapshot: 22 November 2026 | com.iitsm backend | Explicit members; generated accessors omitted
+package "entity" {
+class "Administrator" as Administrator <<JPA entity>> #EAF4FF {
+ +getRole() : Role
+}
+abstract class "CatalogItem" as CatalogItem #EAF4FF {
+ -id : Long
+ -name : String
+ -active : boolean
+ --
+ +update(name: String, active: boolean) : void
+}
+class "Employee" as Employee <<JPA entity>> #EAF4FF {
+ +getRole() : Role
+}
+class "Incident" as Incident <<JPA entity>> #EAF4FF {
+ -id : Long
+ -version : long
+ -title : String
+ -description : String
+ -reporter : User
+ -technician : Technician
+ -service : ServiceItem
+ -category : IncidentCategory
+ -impact : int
+ -urgency : int
+ -affectedUsers : int
+ -priorityScore : double
+ -priority : Priority
+ -priorityReason : String
+ -assignmentReason : String
+ -status : Status
+ -slaPolicy : SlaPolicy
+ -sla : SlaTracking
+ -createdAt : Instant
+ -updatedAt : Instant
+ -verifiedAt : Instant
+ -closedAt : Instant
+ -resolutionDetails : String
+ -verificationDetails : String
+ --
+ +revise(title: String,\n    description: String,\n    service: ServiceItem,\n    category: IncidentCategory,\n    impact: int,\n    urgency: int,\n    users: int) : void
+ +prioritize(p: Priority, score: double, reason: String, policy: SlaPolicy) : void
+ +assign(tech: Technician, reason: String) : void
+ +transition(state: IncidentState, target: Status) : void
+ +acknowledge(now: Instant) : void
+ +resolve(detail: String, now: Instant) : void
+ +verify(detail: String, now: Instant) : void
+ +close(now: Instant) : void
+ +reopen() : void
+ +touch() : void
+}
+class "IncidentCategory" as IncidentCategory <<JPA entity>> #EAF4FF {
+ -requiredSkill : String
+ --
+ +configure(skill: String) : void
+}
+class "ServiceItem" as ServiceItem <<JPA entity>> #EAF4FF {
+ -criticality : int
+ -requiredSkill : String
+ --
+ +configure(c: int, s: String) : void
+}
+class "Skill" as Skill <<JPA entity>> #EAF4FF {
+ -id : Long
+ -name : String
+}
+class "SlaPolicy" as SlaPolicy <<JPA entity>> #EAF4FF {
+ -id : Long
+ -priority : Priority
+ -responseMinutes : int
+ -resolutionMinutes : int
+ --
+ +configure(r: int, s: int) : void
+}
+class "SlaTracking" as SlaTracking <<embedded>> #EAF4FF {
+ -responseDeadline : Instant
+ -resolutionDeadline : Instant
+ -acknowledgedAt : Instant
+ -resolvedAt : Instant
+ -responseViolated : boolean
+ -resolutionViolated : boolean
+ -warningLevel : SlaLevel
+ --
+ +plan(created: Instant, policy: SlaPolicy) : void
+ +acknowledge(now: Instant) : void
+ +resolve(now: Instant) : void
+ +reopen() : void
+ +detect(now: Instant) : SlaLevel
+}
+class "Technician" as Technician <<JPA entity>> #EAF4FF {
+ -available : boolean
+ -maxWorkload : int
+ -experienceYears : int
+ -skills : Set<Skill>
+ --
+ +getRole() : Role
+ +configure(available: boolean, maximum: int, experience: int, skills: Set<Skill>) : void
+ +getSkills() : Set<Skill>
+}
+abstract class "User" as User <<JPA entity>> #EAF4FF {
+ -id : Long
+ -email : String
+ -passwordHash : String
+ -name : String
+ -active : boolean
+ -createdAt : Instant
+ --
+ {abstract} +getRole() : Role
+ +update(name: String, active: boolean) : void
+}
+}
+package "model" {
+enum "Priority" as Priority #EDF2F7 {
+ P1
+ P2
+ P3
+ P4
+}
+enum "Role" as Role #EDF2F7 {
+ EMPLOYEE
+ TECHNICIAN
+ ADMIN
+}
+enum "SlaLevel" as SlaLevel #EDF2F7 {
+ SAFE
+ APPROACHING
+ AT_RISK
+ VIOLATED
+}
+enum "Status" as Status #EDF2F7 {
+ NEW
+ CLASSIFIED
+ ASSIGNED
+ ACKNOWLEDGED
+ IN_PROGRESS
+ RESOLVED
+ VERIFIED
+ CLOSED
+}
+}
+package "state" {
+interface "IncidentState" as IncidentState #EDE9FC {
+}
+}
+User <|-- Administrator
+User <|-- Employee
+Incident --> Priority : priority
+Incident --> Status : status
+CatalogItem <|-- IncidentCategory
+CatalogItem <|-- ServiceItem
+SlaPolicy --> Priority : priority
+SlaTracking --> SlaLevel : warningLevel
+User <|-- Technician
+Incident "0..*" --> "1" User : reporter
+Incident "0..*" --> "0..1" Technician : technician
+Incident "0..*" --> "1" ServiceItem : service
+Incident "0..*" --> "1" IncidentCategory : category
+Incident "0..*" --> "0..1" SlaPolicy : slaPolicy
+Incident "1" *-- "1" SlaTracking : embedded ownership
+Technician "0..*" o-- "0..*" Skill : shared skills
+Incident ..> IncidentState : transition(state, target)
+IncidentState ..> Incident : uses
+IncidentState ..> Status : uses
+IncidentState ..> Status : returns
+legend bottom left
+DESIGN NOTES
+User is abstract; users.role is the JPA SINGLE_TABLE discriminator.
+Administrator is the actual Java class for the ADMIN role.
+Incident stores a User reporter: reporting is not restricted to Employee subtypes.
+SlaTracking is embedded and owned; skills are shared entities.
+SlaPolicy is nullable in the schema; normal creation assigns a policy before commit.
+
+NOTATION
++ public   # protected   - private   ~ package
+Solid hollow triangle: inheritance | Dashed hollow triangle: interface realization
+Filled diamond: composition | Hollow diamond: shared aggregation
+Arrow: stored association | Dashed arrow: dependency
+endlegend
+@enduml

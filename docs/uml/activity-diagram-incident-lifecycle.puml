@@ -1,0 +1,57 @@
+@startuml
+!pragma layout smetana
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam defaultFontName SansSerif
+skinparam defaultFontSize 12
+skinparam ArrowColor #6C83AD
+skinparam classBackgroundColor #F4F7FE
+skinparam classBorderColor #9BAFD4
+skinparam actorBorderColor #6C83AD
+skinparam usecaseBackgroundColor #F4F7FE
+skinparam usecaseBorderColor #9BAFD4
+title Incident lifecycle — state and permission checks
+start
+:Employee reports incident;
+:NEW;
+:Classify selected category and service;
+:CLASSIFIED;
+:Calculate score, priority and SLA deadlines;
+:Detect duplicates / recommend technician;
+if (Eligible technician available?) then (yes)
+ :Assign technician with capacity lock;
+else (no)
+ :Remain CLASSIFIED;
+ :Administrator assigns when capacity is available;
+endif
+:ASSIGNED;
+:Assigned technician acknowledges;
+:ACKNOWLEDGED;
+:Start investigation;
+:IN_PROGRESS;
+repeat
+ :Add notes / request and receive information;
+ :Record resolution details;
+repeat while (Details shorter than 10 characters?) is (yes)
+:RESOLVED;
+if (Reporter confirms fix?) then (yes)
+ :Record verification details;
+ :VERIFIED;
+ :Reporter closes incident;
+ :CLOSED;
+else (no)
+ :Reporter / assigned technician / administrator provides reopening justification;
+ :IN_PROGRESS (reopened);
+ :Investigate and repeat resolution + verification;
+endif
+:Preserve records, feedback and audit history;
+stop
+note right
+ Every action validates role, ownership and current IncidentState.
+ Disallowed transitions return HTTP 409 with no committed mutation.
+ Unauthorized operations return HTTP 403.
+ SLA scheduler independently records warnings, violations and escalations.
+ Closed incidents can be reopened with justification and an audit event.
+end note
+
+@enduml

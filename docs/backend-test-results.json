@@ -1,0 +1,87 @@
+{
+  "verified_date": "2026-11-22",
+  "command": "mvn clean verify (fresh submission extraction and isolated PostgreSQL)",
+  "runtime": "Amazon Corretto 21.0.13.1",
+  "compiler_target": "Java 21",
+  "database": "PostgreSQL 17.10",
+  "totals": {
+    "tests": 53,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "suites": [
+    {
+      "name": "com.iitsm.integration.IncidentWorkflowTest",
+      "tests": "19",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "20.709"
+    },
+    {
+      "name": "com.iitsm.integration.RepositoryPersistenceTest",
+      "tests": "2",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "2.119"
+    },
+    {
+      "name": "com.iitsm.observer.EventPublisherTest",
+      "tests": "1",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.078"
+    },
+    {
+      "name": "com.iitsm.service.DuplicateDetectionTest",
+      "tests": "4",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.004"
+    },
+    {
+      "name": "com.iitsm.service.EmailRecipientOverrideTest",
+      "tests": "6",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.182"
+    },
+    {
+      "name": "com.iitsm.service.SlaTrackingTest",
+      "tests": "6",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.004"
+    },
+    {
+      "name": "com.iitsm.state.IncidentStateTest",
+      "tests": "4",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.005"
+    },
+    {
+      "name": "com.iitsm.strategy.AssignmentStrategyTest",
+      "tests": "4",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.005"
+    },
+    {
+      "name": "com.iitsm.strategy.PriorityStrategyTest",
+      "tests": "7",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.005"
+    }
+  ]
+}

@@ -1,0 +1,247 @@
+@startuml
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam defaultFontName SansSerif
+skinparam defaultFontSize 14
+skinparam classFontSize 16
+skinparam classAttributeFontSize 13
+skinparam classBorderColor #69839D
+skinparam ArrowColor #526B83
+skinparam packageBorderColor #B4C2CF
+skinparam packageBackgroundColor #FAFCFE
+skinparam classAttributeIconSize 0
+skinparam linetype polyline
+skinparam nodesep 35
+skinparam ranksep 55
+hide empty members
+
+title I-ITSM | REST controllers and security
+caption Source snapshot: 22 November 2026 | com.iitsm backend | Explicit members; generated accessors omitted
+package "controller" {
+class "AuthController" as AuthController #FFF0E8 {
+ -auth : AuthService
+ --
+ +register(r: Requests.Register) : Views.Auth
+ +login(r: Requests.Login) : Views.Auth
+}
+class "CatalogController" as CatalogController #FFF0E8 {
+ -services : ServiceItemRepository
+ -categories : IncidentCategoryRepository
+ -service : CatalogService
+ -access : AccessService
+ -mapper : ViewMapper
+ --
+ +services() : List<Views.Catalog>
+ +categories() : List<Views.Catalog>
+ +createService(r: Requests.CatalogInput) : Views.Catalog
+ +service(id: Long, r: Requests.CatalogInput) : Views.Catalog
+ +createCategory(r: Requests.CatalogInput) : Views.Catalog
+ +category(id: Long, r: Requests.CatalogInput) : Views.Catalog
+}
+class "ConfigurationController" as ConfigurationController #FFF0E8 {
+ -config : ConfigurationService
+ -incidents : IncidentQueryService
+ --
+ +settings() : SystemSettings
+ +settings(r: Requests.Settings) : SystemSettings
+ +policies() : List<SlaPolicy>
+ +create(r: Requests.Policy) : SlaPolicy
+ +update(id: Long, r: Requests.Policy) : SlaPolicy
+ +violations(page: int) : org.springframework.data.domain.Page<Views.IncidentView>
+}
+class "IncidentChatController" as IncidentChatController #FFF0E8 {
+ -chat : IncidentChatService
+ --
+ +messages(id: long, technicianId: long) : List<IncidentChatService.Message>
+ +send(id: long, request: ChatMessage) : void
+}
+class "IncidentController" as IncidentController #FFF0E8 {
+ -service : IncidentService
+ -queries : IncidentQueryService
+ -assignments : AssignmentService
+ -mapper : ViewMapper
+ --
+ +list(f: Map<String, String>, page: int, size: int) : Page<Views.IncidentView>
+ +create(r: Requests.IncidentInput) : Views.IncidentView
+ +export(filters: Map<String, String>) : List<Views.IncidentView>
+ +get(id: Long) : Views.DetailView
+ +update(id: Long, r: Requests.IncidentInput) : Views.IncidentView
+ +assign(id: Long, r: Requests.Assign) : Views.IncidentView
+ +recommendations(id: Long) : List<Views.Recommendation>
+ +ack(id: Long) : Views.IncidentView
+ +investigate(id: Long) : Views.IncidentView
+ +resolve(id: Long, r: Requests.Detail) : Views.IncidentView
+ +verify(id: Long, r: Requests.Detail) : Views.IncidentView
+ +close(id: Long) : Views.IncidentView
+ +reopen(id: Long, r: Requests.Detail) : Views.IncidentView
+ +note(id: Long, r: Requests.Detail) : Map<String, Boolean>
+ +request(id: Long, r: Requests.Detail) : Map<String, Boolean>
+ +feedback(id: Long, r: Requests.Rating) : Map<String, Boolean>
+ +duplicate(id: Long, suggestionId: Long, r: Requests.Decision) : Map<String, Boolean>
+}
+class "NotificationController" as NotificationController #FFF0E8 {
+ -notifications : NotificationService
+ --
+ +list() : List<Views.NotificationView>
+ +reply(id: Long, message: ChatMessage) : void
+ +read(id: Long) : Map<String, Boolean>
+}
+class "ReportController" as ReportController #FFF0E8 {
+ -reports : ReportService
+ -audits : AuditLogRepository
+ -emails : EmailMessageRepository
+ -mapper : ViewMapper
+ --
+ +comparison(period: String, date: java.time.LocalDate) : ReportService.Comparison
+ +overview() : Map<String, Object>
+ +workload() : List<Map<String, Object>>
+ +category() : List<Map<String, Object>>
+ +service() : List<Map<String, Object>>
+ +trends() : List<Map<String, Object>>
+ +audit(page: int) : Page<Views.Audit>
+ +outbox(page: int) : Page<EmailMessage>
+ +health() : Map<String, String>
+}
+class "TechnicianController" as TechnicianController #FFF0E8 {
+ -technicians : TechnicianRepository
+ -access : AccessService
+ -assignments : AssignmentService
+ -queries : IncidentQueryService
+ -mapper : ViewMapper
+ --
+ +list() : List<Views.UserView>
+ +workload(id: Long) : Map<String, Object>
+ +recommendation(id: Long, incidentId: Long) : List<Views.Recommendation>
+}
+class "UserController" as UserController #FFF0E8 {
+ -users : UserRepository
+ -service : UserManagementService
+ -access : AccessService
+ -mapper : ViewMapper
+ --
+ +me() : Views.UserView
+ +profile(r: Requests.Profile) : Views.UserView
+ +list() : List<Views.UserView>
+ +create(r: Requests.UserInput) : Views.UserView
+ +update(id: Long, r: Requests.UserInput) : Views.UserView
+ +remove(id: Long) : void
+}
+}
+package "entity" {
+abstract class "User" as User <<JPA entity>> #EAF4FF {
+}
+}
+package "mapper" {
+class "ViewMapper" as ViewMapper #F0EDFA {
+}
+}
+package "repository" {
+interface "UserRepository" as UserRepository #EAF4EE {
+}
+}
+package "security" {
+class "AccessService" as AccessService #FCE8EC {
+ -users : UserRepository
+ --
+ +current() : User
+ +read(u: User, i: Incident) : void
+ +technician(u: User, i: Incident) : void
+ +reporter(u: User, i: Incident) : void
+ +admin(u: User) : void
+}
+class "JwtFilter" as JwtFilter #FCE8EC {
+ -jwt : JwtService
+ -users : UserRepository
+ --
+ #doFilterInternal(request: HttpServletRequest, response: HttpServletResponse, chain: FilterChain) : void
+}
+class "JwtService" as JwtService #FCE8EC {
+ -key : SecretKey
+ --
+ +issue(email: String) : String
+ +subject(token: String) : String
+}
+class "SecurityConfig" as SecurityConfig #FCE8EC {
+ ~passwordEncoder() : PasswordEncoder
+ ~filterChain(http: HttpSecurity, filter: JwtFilter, origins: String) : SecurityFilterChain
+}
+}
+package "service" {
+class "AssignmentService" as AssignmentService #F0F5F9 {
+}
+class "AuthService" as AuthService #F0F5F9 {
+}
+class "CatalogService" as CatalogService #F0F5F9 {
+}
+class "ConfigurationService" as ConfigurationService #F0F5F9 {
+}
+class "IncidentChatService" as IncidentChatService #F0F5F9 {
+}
+class "IncidentQueryService" as IncidentQueryService #F0F5F9 {
+}
+class "IncidentService" as IncidentService #F0F5F9 {
+}
+class "NotificationService" as NotificationService #F0F5F9 {
+}
+class "ReportService" as ReportService #F0F5F9 {
+}
+class "UserManagementService" as UserManagementService #F0F5F9 {
+}
+}
+AuthController --> AuthService : auth
+CatalogController --> CatalogService : service
+CatalogController --> AccessService : access
+CatalogController --> ViewMapper : mapper
+ConfigurationController --> ConfigurationService : config
+ConfigurationController --> IncidentQueryService : incidents
+IncidentChatController --> IncidentChatService : chat
+IncidentController --> IncidentService : service
+IncidentController --> IncidentQueryService : queries
+IncidentController --> AssignmentService : assignments
+IncidentController --> ViewMapper : mapper
+NotificationController --> NotificationService : notifications
+ReportController --> ReportService : reports
+ReportController --> ViewMapper : mapper
+TechnicianController --> AccessService : access
+TechnicianController --> AssignmentService : assignments
+TechnicianController --> IncidentQueryService : queries
+TechnicianController --> ViewMapper : mapper
+UserController --> UserRepository : users
+UserController --> UserManagementService : service
+UserController --> AccessService : access
+UserController --> ViewMapper : mapper
+AccessService --> UserRepository : users
+JwtFilter --> JwtService : jwt
+JwtFilter --> UserRepository : users
+AssignmentService --> ConfigurationService : config
+AuthService --> UserRepository : users
+AuthService --> JwtService : jwt
+AuthService --> ViewMapper : mapper
+CatalogService --> AccessService : access
+ConfigurationService --> AccessService : access
+IncidentChatService --> AccessService : access
+IncidentQueryService --> AccessService : access
+IncidentQueryService --> ViewMapper : mapper
+IncidentService --> AccessService : access
+IncidentService --> AssignmentService : assignment
+NotificationService --> AccessService : access
+NotificationService --> ViewMapper : mapper
+NotificationService --> IncidentChatService : chat
+ReportService --> AccessService : access
+ReportService --> AssignmentService : assignments
+UserManagementService --> UserRepository : users
+UserManagementService --> AccessService : access
+UserRepository ..> User : persists
+legend bottom left
+DESIGN NOTES
+REST controllers expose validated request/response DTOs listed on sheets 10 and 11.
+JwtFilter authenticates tokens and checks the active persisted user.
+AccessService enforces incident ownership, reporter, technician and administrator permissions.
+
+NOTATION
++ public   # protected   - private   ~ package
+Solid hollow triangle: inheritance | Dashed hollow triangle: interface realization
+Filled diamond: composition | Hollow diamond: shared aggregation
+Arrow: stored association | Dashed arrow: dependency
+endlegend
+@enduml

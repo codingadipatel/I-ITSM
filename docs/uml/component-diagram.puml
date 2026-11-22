@@ -1,0 +1,71 @@
+@startuml
+!pragma layout smetana
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam defaultFontName SansSerif
+skinparam defaultFontSize 12
+skinparam ArrowColor #6C83AD
+skinparam classBackgroundColor #F4F7FE
+skinparam classBorderColor #9BAFD4
+skinparam actorBorderColor #6C83AD
+skinparam usecaseBackgroundColor #F4F7FE
+skinparam usecaseBorderColor #9BAFD4
+title I-ITSM — Components
+package "React + TypeScript / Vite" {
+ [Public auth and landing] as Public
+ [Role-aware layout / guards] as Guards
+ [Incident workspace / forms] as Incidents
+ [Admin management / settings] as Admin
+ [Recharts analytics] as Charts
+ [Axios API client] as Client
+}
+package "Spring Boot / Java 21" {
+ [JWT filter / Spring Security] as Security
+ [REST controllers / Bean Validation] as Controllers
+ [Application services] as Services
+ [Priority and assignment strategies] as Strategies
+ [Incident states / registry] as States
+ [SLA scheduler] as Scheduler
+ [IncidentEventPublisher] as Publisher
+ [AuditObserver] as Audit
+ [NotificationObserver] as Notify
+ [InAppNotificationChannel] as Channels
+ [IncidentEmailService] as EmailQueue
+ [EmailScheduler / SmtpOutboxService] as MailWorker
+ [IncidentChatService / JdbcTemplate] as Chat
+ [Spring Data JPA repositories] as Repositories
+ [Flyway migrations] as Flyway
+}
+database "PostgreSQL 17" as DB
+[SMTP server] as SMTP
+Public --> Client
+Guards --> Incidents
+Guards --> Admin
+Guards --> Charts
+Incidents --> Client
+Admin --> Client
+Charts --> Client
+Client --> Security : HTTP JSON + Bearer JWT
+Security --> Controllers
+Controllers --> Services
+Services --> Strategies
+Services --> States
+Services --> Publisher
+Scheduler --> Services
+Publisher --> Audit
+Publisher --> Notify
+Notify --> Channels
+Audit --> Repositories
+Channels --> Repositories
+Publisher --> EmailQueue
+EmailQueue --> DB : queue email_outbox
+MailWorker --> DB : claim / update outbox
+MailWorker --> SMTP : send after commit
+Services --> Chat
+Chat --> DB : persisted incident chat
+Services --> Repositories
+Repositories --> DB : JDBC
+Flyway --> DB : versioned migrations
+
+
+@enduml

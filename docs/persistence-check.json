@@ -1,0 +1,22 @@
+{
+  "before": {
+    "incidents": 7,
+    "notes": 1,
+    "audits": 49,
+    "notifications": 94,
+    "feedback": 1,
+    "duplicateConfirmed": 1,
+    "closedStatus": "CLOSED"
+  },
+  "after": {
+    "incidents": 7,
+    "notes": 1,
+    "audits": 49,
+    "notifications": 94,
+    "feedback": 1,
+    "duplicateConfirmed": 1,
+    "closedStatus": "CLOSED"
+  },
+  "match": true,
+  "auditMutationRejected": true
+}

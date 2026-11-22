@@ -1,0 +1,177 @@
+@startuml
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam defaultFontName SansSerif
+skinparam defaultFontSize 14
+skinparam classFontSize 16
+skinparam classAttributeFontSize 13
+skinparam classBorderColor #69839D
+skinparam ArrowColor #526B83
+skinparam packageBorderColor #B4C2CF
+skinparam packageBackgroundColor #FAFCFE
+skinparam classAttributeIconSize 0
+skinparam linetype polyline
+skinparam nodesep 35
+skinparam ranksep 55
+hide empty members
+
+title I-ITSM | User management, authentication and configuration
+caption Source snapshot: 22 November 2026 | com.iitsm backend | Explicit members; generated accessors omitted
+package "entity" {
+class "Administrator" as Administrator <<JPA entity>> #EAF4FF {
+}
+class "Employee" as Employee <<JPA entity>> #EAF4FF {
+}
+class "Technician" as Technician <<JPA entity>> #EAF4FF {
+}
+abstract class "User" as User <<JPA entity>> #EAF4FF {
+}
+}
+package "factory" {
+class "UserFactory" as UserFactory #FFF2D6 {
+ -encoder : PasswordEncoder
+ --
+ +create(role: Role, name: String, email: String, password: String) : User
+}
+}
+package "mapper" {
+class "ViewMapper" as ViewMapper #F0EDFA {
+ +user(u: User) : UserView
+ +service(s: ServiceItem) : Catalog
+ +category(c: IncidentCategory) : Catalog
+ +incident(i: Incident) : IncidentView
+ +audit(a: AuditLog) : Audit
+ +note(n: IncidentNote) : Note
+ +duplicate(d: DuplicateSuggestion, current: Long) : Duplicate
+ +notification(n: Notification, conversation: NotificationConversation) : NotificationView
+}
+}
+package "observer" {
+class "IncidentEventPublisher" as IncidentEventPublisher #E3F5EC {
+}
+}
+package "repository" {
+interface "IncidentCategoryRepository" as IncidentCategoryRepository #EAF4EE {
+}
+interface "NotificationRepository" as NotificationRepository #EAF4EE {
+}
+interface "ServiceItemRepository" as ServiceItemRepository #EAF4EE {
+}
+interface "SkillRepository" as SkillRepository #EAF4EE {
+}
+interface "SlaPolicyRepository" as SlaPolicyRepository #EAF4EE {
+}
+interface "SystemSettingsRepository" as SystemSettingsRepository #EAF4EE {
+}
+interface "TechnicianRepository" as TechnicianRepository #EAF4EE {
+}
+interface "UserRepository" as UserRepository #EAF4EE {
+}
+}
+package "security" {
+class "AccessService" as AccessService #FCE8EC {
+}
+class "JwtService" as JwtService #FCE8EC {
+}
+}
+package "service" {
+class "AuthService" as AuthService #F0F5F9 {
+ -users : UserRepository
+ -factory : UserFactory
+ -encoder : PasswordEncoder
+ -jwt : JwtService
+ -mapper : ViewMapper
+ --
+ +register(r: Requests.Register) : Views.Auth
+ +login(r: Requests.Login) : Views.Auth
+}
+class "CatalogService" as CatalogService #F0F5F9 {
+ -services : ServiceItemRepository
+ -categories : IncidentCategoryRepository
+ -access : AccessService
+ -events : IncidentEventPublisher
+ --
+ +service(id: Long, r: Requests.CatalogInput) : ServiceItem
+ +category(id: Long, r: Requests.CatalogInput) : IncidentCategory
+}
+class "ConfigurationService" as ConfigurationService #F0F5F9 {
+ -settings : SystemSettingsRepository
+ -policies : SlaPolicyRepository
+ -access : AccessService
+ -events : IncidentEventPublisher
+ --
+ +settings() : SystemSettings
+ +update(r: Requests.Settings) : SystemSettings
+ +policies() : List<SlaPolicy>
+ +policy(id: Long, r: Requests.Policy) : SlaPolicy
+}
+class "IncidentChatService" as IncidentChatService #F0F5F9 {
+}
+class "NotificationService" as NotificationService #F0F5F9 {
+ -notifications : NotificationRepository
+ -access : AccessService
+ -mapper : ViewMapper
+ -chat : IncidentChatService
+ --
+ +list() : List<Views.NotificationView>
+ +read(id: Long) : void
+ +reply(id: Long, message: ChatMessage) : void
+ -ownedNotification(id: Long, actor: User) : Notification
+}
+class "UserManagementService" as UserManagementService #F0F5F9 {
+ -users : UserRepository
+ -skills : SkillRepository
+ -factory : UserFactory
+ -access : AccessService
+ -events : IncidentEventPublisher
+ --
+ -skills(names: Set<String>) : Set<Skill>
+ +save(id: Long, r: Requests.UserInput) : User
+ +deactivate(id: Long) : void
+ +profile(r: Requests.Profile) : User
+}
+}
+User <|-- Administrator
+User <|-- Employee
+User <|-- Technician
+AccessService --> UserRepository : users
+AuthService --> UserRepository : users
+AuthService --> UserFactory : factory
+AuthService --> JwtService : jwt
+AuthService --> ViewMapper : mapper
+CatalogService --> ServiceItemRepository : services
+CatalogService --> IncidentCategoryRepository : categories
+CatalogService --> AccessService : access
+CatalogService --> IncidentEventPublisher : events
+ConfigurationService --> SystemSettingsRepository : settings
+ConfigurationService --> SlaPolicyRepository : policies
+ConfigurationService --> AccessService : access
+ConfigurationService --> IncidentEventPublisher : events
+IncidentChatService --> AccessService : access
+NotificationService --> NotificationRepository : notifications
+NotificationService --> AccessService : access
+NotificationService --> ViewMapper : mapper
+NotificationService --> IncidentChatService : chat
+UserManagementService --> UserRepository : users
+UserManagementService --> SkillRepository : skills
+UserManagementService --> UserFactory : factory
+UserManagementService --> AccessService : access
+UserManagementService --> IncidentEventPublisher : events
+UserFactory ..> Employee : creates
+UserFactory ..> Technician : creates
+UserFactory ..> Administrator : creates
+TechnicianRepository ..> Technician : persists
+UserRepository ..> User : persists
+legend bottom left
+DESIGN NOTES
+UserFactory creates concrete subtypes and hashes passwords with PasswordEncoder.
+Registration creates Employee accounts; administrative user management selects roles.
+ViewMapper creates DTOs; generated Lombok getters are deliberately omitted from all sheets.
+
+NOTATION
++ public   # protected   - private   ~ package
+Solid hollow triangle: inheritance | Dashed hollow triangle: interface realization
+Filled diamond: composition | Hollow diamond: shared aggregation
+Arrow: stored association | Dashed arrow: dependency
+endlegend
+@enduml

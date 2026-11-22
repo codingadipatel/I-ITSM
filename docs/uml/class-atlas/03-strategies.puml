@@ -1,0 +1,176 @@
+@startuml
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam defaultFontName SansSerif
+skinparam defaultFontSize 14
+skinparam classFontSize 16
+skinparam classAttributeFontSize 13
+skinparam classBorderColor #69839D
+skinparam ArrowColor #526B83
+skinparam packageBorderColor #B4C2CF
+skinparam packageBackgroundColor #FAFCFE
+skinparam classAttributeIconSize 0
+skinparam linetype polyline
+skinparam nodesep 35
+skinparam ranksep 55
+hide empty members
+
+title I-ITSM | Priority and technician assignment strategies
+caption Source snapshot: 22 November 2026 | com.iitsm backend | Explicit members; generated accessors omitted
+package "entity" {
+class "Incident" as Incident <<JPA entity>> #EAF4FF {
+}
+class "SystemSettings" as SystemSettings <<JPA entity>> #EAF4FF {
+ -id : Long
+ -assignmentStrategy : String
+ -priorityStrategy : String
+ -p1Threshold : double
+ -p2Threshold : double
+ -p3Threshold : double
+ -emailEnabled : boolean
+ --
+ +configure(assignment: String, priority: String, p1: double, p2: double, p3: double, email: boolean) : void
+}
+class "Technician" as Technician <<JPA entity>> #EAF4FF {
+}
+}
+package "observer" {
+class "IncidentEventPublisher" as IncidentEventPublisher #E3F5EC {
+}
+}
+package "repository" {
+interface "AssignmentRepository" as AssignmentRepository #EAF4EE {
+}
+interface "IncidentRepository" as IncidentRepository #EAF4EE {
+}
+interface "SlaPolicyRepository" as SlaPolicyRepository #EAF4EE {
+}
+interface "TechnicianRepository" as TechnicianRepository #EAF4EE {
+}
+}
+package "service" {
+class "AssignmentService" as AssignmentService #F0F5F9 {
+ -strategies : Map<String, TechnicianAssignmentStrategy>
+ -technicians : TechnicianRepository
+ -incidents : IncidentRepository
+ -assignments : AssignmentRepository
+ -config : ConfigurationService
+ -events : IncidentEventPublisher
+ -states : StateRegistry
+ --
+ +workload(id: Long) : long
+ +recommend(i: Incident) : Optional<TechnicianAssignmentStrategy.Recommendation>
+ +autoAssign(i: Incident, actor: User) : void
+ +assign(i: Incident, technicianId: Long, actor: User, reason: String) : void
+}
+class "ConfigurationService" as ConfigurationService #F0F5F9 {
+}
+class "PriorityCalculationService" as PriorityCalculationService #F0F5F9 {
+ -strategies : Map<String, PriorityStrategy>
+ -config : ConfigurationService
+ -policies : SlaPolicyRepository
+ --
+ +calculate(i: Incident) : void
+}
+}
+package "state" {
+class "StateRegistry" as StateRegistry #EDE9FC {
+}
+}
+package "strategy" {
+class "LoadBasedAssignmentStrategy" as LoadBasedAssignmentStrategy #FFF2D6 {
+ +key() : String
+ +recommend(incident: Incident, candidates: List<Candidate>) : Optional<Recommendation>
+}
+interface "PriorityStrategy" as PriorityStrategy #FFF2D6 {
+ +key() : String
+ +calculate(incident: Incident, settings: SystemSettings) : Result
+ +result(score: double, s: SystemSettings, reason: String) : Result
+}
+class "PriorityStrategy.Result" as PriorityStrategy_Result <<record>> #FFF2D6 {
+ -priority : Priority
+ -score : double
+ -reason : String
+}
+class "RuleBasedPriorityStrategy" as RuleBasedPriorityStrategy #FFF2D6 {
+ +key() : String
+ +calculate(i: Incident, s: SystemSettings) : Result
+}
+class "SkillBasedAssignmentStrategy" as SkillBasedAssignmentStrategy #FFF2D6 {
+ +key() : String
+ +recommend(i: Incident, candidates: List<Candidate>) : Optional<Recommendation>
+}
+interface "TechnicianAssignmentStrategy" as TechnicianAssignmentStrategy #FFF2D6 {
+ +key() : String
+ +recommend(incident: Incident, candidates: List<Candidate>) : Optional<Recommendation>
+}
+class "TechnicianAssignmentStrategy.Candidate" as TechnicianAssignmentStrategy_Candidate <<record>> #FFF2D6 {
+ -technician : Technician
+ -workload : long
+ -resolvedInCategory : int
+ --
+ +eligible() : boolean
+}
+class "TechnicianAssignmentStrategy.Recommendation" as TechnicianAssignmentStrategy_Recommendation <<record>> #FFF2D6 {
+ -technician : Technician
+ -reason : String
+ -score : double
+}
+class "WeightedPriorityStrategy" as WeightedPriorityStrategy #FFF2D6 {
+ +key() : String
+ +calculate(i: Incident, s: SystemSettings) : Result
+}
+}
+AssignmentService --> TechnicianRepository : technicians
+AssignmentService --> IncidentRepository : incidents
+AssignmentService --> AssignmentRepository : assignments
+AssignmentService --> ConfigurationService : config
+AssignmentService --> IncidentEventPublisher : events
+AssignmentService --> StateRegistry : states
+ConfigurationService --> SlaPolicyRepository : policies
+ConfigurationService --> IncidentEventPublisher : events
+PriorityCalculationService --> ConfigurationService : config
+PriorityCalculationService --> SlaPolicyRepository : policies
+TechnicianAssignmentStrategy <|.. LoadBasedAssignmentStrategy
+PriorityStrategy <|.. RuleBasedPriorityStrategy
+TechnicianAssignmentStrategy <|.. SkillBasedAssignmentStrategy
+TechnicianAssignmentStrategy_Candidate --> Technician : technician
+TechnicianAssignmentStrategy_Recommendation --> Technician : technician
+PriorityStrategy <|.. WeightedPriorityStrategy
+Incident "0..*" --> "0..1" Technician : technician
+IncidentRepository ..> Incident : persists
+TechnicianRepository ..> Technician : persists
+LoadBasedAssignmentStrategy ..> Incident : uses
+LoadBasedAssignmentStrategy ..> TechnicianAssignmentStrategy_Candidate : uses
+PriorityStrategy ..> Incident : uses
+PriorityStrategy ..> SystemSettings : uses
+RuleBasedPriorityStrategy ..> Incident : uses
+RuleBasedPriorityStrategy ..> SystemSettings : uses
+SkillBasedAssignmentStrategy ..> Incident : uses
+SkillBasedAssignmentStrategy ..> TechnicianAssignmentStrategy_Candidate : uses
+TechnicianAssignmentStrategy ..> Incident : uses
+TechnicianAssignmentStrategy ..> TechnicianAssignmentStrategy_Candidate : uses
+WeightedPriorityStrategy ..> Incident : uses
+WeightedPriorityStrategy ..> SystemSettings : uses
+LoadBasedAssignmentStrategy ..> TechnicianAssignmentStrategy_Recommendation : returns
+PriorityStrategy ..> PriorityStrategy_Result : returns
+RuleBasedPriorityStrategy ..> PriorityStrategy_Result : returns
+SkillBasedAssignmentStrategy ..> TechnicianAssignmentStrategy_Recommendation : returns
+TechnicianAssignmentStrategy ..> TechnicianAssignmentStrategy_Recommendation : returns
+WeightedPriorityStrategy ..> PriorityStrategy_Result : returns
+AssignmentService "1" o-- "0..*" TechnicianAssignmentStrategy : strategies
+PriorityCalculationService "1" o-- "0..*" PriorityStrategy : strategies
+legend bottom left
+DESIGN NOTES
+Priority keys: WEIGHTED and RULE. Assignment keys: SKILL and LOAD.
+Strategies are injected and selected by SystemSettings at runtime.
+Candidate.eligible requires active, available and workload below capacity.
+There is no IncidentStrategy class: the two actual interfaces are shown.
+
+NOTATION
++ public   # protected   - private   ~ package
+Solid hollow triangle: inheritance | Dashed hollow triangle: interface realization
+Filled diamond: composition | Hollow diamond: shared aggregation
+Arrow: stored association | Dashed arrow: dependency
+endlegend
+@enduml

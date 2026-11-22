@@ -1,0 +1,65 @@
+@startuml
+!pragma layout smetana
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam defaultFontName SansSerif
+skinparam defaultFontSize 12
+skinparam ArrowColor #6C83AD
+skinparam classBackgroundColor #F4F7FE
+skinparam classBorderColor #9BAFD4
+skinparam actorBorderColor #6C83AD
+skinparam usecaseBackgroundColor #F4F7FE
+skinparam usecaseBorderColor #9BAFD4
+title Explainable assignment and administrative override
+actor Administrator as Admin
+participant "React incident workspace" as UI
+participant IncidentController as C
+participant AccessService as Access
+participant IncidentService as S
+participant AssignmentService as A
+participant ConfigurationService as Config
+participant TechnicianAssignmentStrategy as Strategy
+participant "TechnicianRepository / IncidentRepository" as R
+participant AssignmentRepository as Assignments
+participant "Audit / Notification / Email repositories" as RecordRepos
+participant IncidentEventPublisher as Events
+participant "AuditObserver / NotificationObserver / IncidentEmailService" as Observers
+database PostgreSQL as DB
+Admin -> UI : open recommendation
+UI -> C : GET /incidents/{id}/recommendations
+C -> Access : require role + permitted incident
+C -> A : recommend(incident)
+A -> Config : active strategy
+A -> R : technicians, workload, resolved-in-category counts
+R -> DB : SELECT persisted candidates
+A -> Strategy : recommend(incident, candidates)
+Strategy -> Strategy : exclude inactive, unavailable, full capacity
+Strategy -> Strategy : rank by skill/history/experience/load OR lowest load
+Strategy --> A : recommendation + explanation
+A --> C : Optional recommendation
+C --> UI : technician ID, name, score, reason
+Admin -> UI : choose technician + override reason
+UI -> C : POST /incidents/{id}/assign
+C -> S : assign(id,input)
+group transactional
+ S -> Access : admin(current user)
+ S -> R : lock incident
+ S -> A : assign(incident,technicianId,actor,reason)
+ A -> R : pessimistic lock technician
+ R -> DB : SELECT ... FOR UPDATE
+ A -> R : recount active workload
+ alt unavailable or capacity exceeded
+  A --> C : 409 conflict
+ else eligible
+  A -> A : Incident.assign; classify -> assigned if needed
+  A -> Assignments : save(Assignment)
+  Assignments -> DB : INSERT incident_assignments
+  A -> Events : ASSIGNED event
+  Events -> Observers : onEvent
+  Observers -> RecordRepos : save audit / in-app / email records
+  RecordRepos -> DB : INSERT durable event effects
+ end
+end
+C --> UI : updated incident or consistent error
+
+@enduml

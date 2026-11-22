@@ -1,0 +1,70 @@
+@startuml
+!pragma layout smetana
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam defaultFontName SansSerif
+skinparam defaultFontSize 12
+skinparam ArrowColor #6C83AD
+skinparam classBackgroundColor #F4F7FE
+skinparam classBorderColor #9BAFD4
+skinparam actorBorderColor #6C83AD
+skinparam usecaseBackgroundColor #F4F7FE
+skinparam usecaseBorderColor #9BAFD4
+title Report incident — one transaction, durable events
+actor Employee
+participant "React IncidentForm" as UI
+participant "JWT filter / AccessService" as Security
+participant IncidentController as Controller
+participant IncidentService as Service
+participant PriorityCalculationService as Priority
+participant PriorityStrategy as Strategy
+participant DuplicateDetectionService as Duplicates
+participant AssignmentService as Assignment
+participant IncidentEventPublisher as Publisher
+participant AuditObserver as Audit
+participant NotificationObserver as Notify
+participant InAppNotificationChannel as Channels
+participant IncidentEmailService as Email
+participant "EmailScheduler / SmtpOutboxService" as Worker
+participant "Configured SMTP server" as SMTP
+participant "Spring Data repositories" as Repository
+database PostgreSQL as DB
+Employee -> UI : enter incident fields / submit
+UI -> Security : POST /api/incidents + JWT
+Security -> Controller : authenticated request
+Controller -> Service : create(validated IncidentInput)
+group transactional
+ Service -> Repository : save NEW incident
+ Repository -> DB : INSERT incidents
+ Service -> Publisher : CREATED
+ Publisher -> Audit : onEvent(event)
+ Audit -> Repository : save audit record
+ Service -> Service : Incident.transition(NewState, CLASSIFIED)
+ Service -> Priority : calculate(incident)
+ Priority -> Strategy : calculate(incident, persisted settings)
+ Strategy --> Priority : score, priority, explanation
+ Priority -> Repository : find SLA policy by priority
+ Priority -> Service : set priority and deadlines
+ Service -> Duplicates : detect(incident)
+ Duplicates -> Repository : find incidents from last 30 days
+ Duplicates -> Repository : persist suggestions >= 0.62
+ Service -> Assignment : autoAssign(incident, actor)
+ ref over Assignment, Repository : Assignment sequence in separate diagram
+ Service -> Publisher : priority / recommendation / assignment events
+ Publisher -> Audit : onEvent(event)
+ Audit -> Repository : append history
+ Publisher -> Notify : onEvent(event)
+ Notify -> Channels : deliver(recipient,incident,type,message)
+ Channels -> Repository : save in-app notification
+ Publisher -> Email : onEvent(assignment / status change)
+ Email -> DB : INSERT email_outbox if enabled
+ Repository -> DB : INSERT durable event effects
+end
+Worker -> DB : claim pending outbox after commit
+Worker -> SMTP : send message if configured and not expired
+Worker -> DB : record sent / retry / failed status
+Service --> Controller : Incident
+Controller --> UI : 201 IncidentView (no password hash)
+UI --> Employee : incident workspace, priority reason, technician, SLA
+
+@enduml

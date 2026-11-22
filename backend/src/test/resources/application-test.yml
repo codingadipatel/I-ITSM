@@ -1,0 +1,9 @@
+spring:
+  datasource:
+    url: ${TEST_DB_URL:jdbc:postgresql://127.0.0.1:55432/iitsm_test}
+    username: ${TEST_DB_USER:iitsm}
+    password: ${TEST_DB_PASSWORD:}
+app:
+  jwt-secret: test-key-for-integration-only-at-least-32-characters
+  demo-enabled: false
+  sla-interval-ms: 3600000

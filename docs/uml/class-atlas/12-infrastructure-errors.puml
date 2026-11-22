@@ -1,0 +1,116 @@
+@startuml
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam defaultFontName SansSerif
+skinparam defaultFontSize 14
+skinparam classFontSize 16
+skinparam classAttributeFontSize 13
+skinparam classBorderColor #69839D
+skinparam ArrowColor #526B83
+skinparam packageBorderColor #B4C2CF
+skinparam packageBackgroundColor #FAFCFE
+skinparam classAttributeIconSize 0
+skinparam linetype polyline
+skinparam nodesep 35
+skinparam ranksep 55
+hide empty members
+
+title I-ITSM | Exception hierarchy, application and demo initialization
+caption Source snapshot: 22 November 2026 | com.iitsm backend | Explicit members; generated accessors omitted
+package "iitsm" {
+class "Application" as Application #EDF2F7 {
+ {static} +main(args: String[]) : void
+}
+}
+package "config" {
+class "DemoDataInitializer" as DemoDataInitializer #EDF2F7 {
+ -enabled : boolean
+ -password : String
+ -users : UserRepository
+ -factory : UserFactory
+ -skills : SkillRepository
+ -incidents : IncidentRepository
+ -services : ServiceItemRepository
+ -categories : IncidentCategoryRepository
+ -priorities : PriorityCalculationService
+ -assignment : AssignmentService
+ -events : IncidentEventPublisher
+ -states : StateRegistry
+ --
+ +run(args: ApplicationArguments) : void
+}
+}
+package "exception" {
+class "AppException" as AppException #FCE8EC {
+ -status : HttpStatus
+}
+class "GlobalExceptionHandler" as GlobalExceptionHandler #FCE8EC {
+ ~app(e: AppException) : ResponseEntity<?>
+ ~bad(e: Exception) : ResponseEntity<?>
+ ~validation(e: MethodArgumentNotValidException) : ResponseEntity<?>
+ ~denied() : ResponseEntity<?>
+ ~conflict() : ResponseEntity<?>
+ ~internal(e: Exception) : ResponseEntity<?>
+ -error(s: HttpStatus, m: String) : ResponseEntity<?>
+}
+class "IncidentNotFoundException" as IncidentNotFoundException #FCE8EC {
+}
+class "InvalidIncidentStateException" as InvalidIncidentStateException #FCE8EC {
+}
+class "SLAConfigurationNotFoundException" as SLAConfigurationNotFoundException #FCE8EC {
+}
+class "ServiceNotFoundException" as ServiceNotFoundException #FCE8EC {
+}
+class "TechnicianUnavailableException" as TechnicianUnavailableException #FCE8EC {
+}
+class "UnauthorizedOperationException" as UnauthorizedOperationException #FCE8EC {
+}
+class "WorkloadExceededException" as WorkloadExceededException #FCE8EC {
+}
+}
+package "factory" {
+class "UserFactory" as UserFactory #FFF2D6 {
+}
+}
+package "repository" {
+interface "IncidentCategoryRepository" as IncidentCategoryRepository #EAF4EE {
+}
+interface "ServiceItemRepository" as ServiceItemRepository #EAF4EE {
+}
+interface "SlaPolicyRepository" as SlaPolicyRepository #EAF4EE {
+}
+interface "SystemSettingsRepository" as SystemSettingsRepository #EAF4EE {
+}
+interface "UserRepository" as UserRepository #EAF4EE {
+}
+}
+package "service" {
+class "IncidentService" as IncidentService #F0F5F9 {
+}
+}
+DemoDataInitializer --> UserRepository : users
+DemoDataInitializer --> UserFactory : factory
+DemoDataInitializer --> ServiceItemRepository : services
+DemoDataInitializer --> IncidentCategoryRepository : categories
+AppException <|-- IncidentNotFoundException
+AppException <|-- InvalidIncidentStateException
+AppException <|-- SLAConfigurationNotFoundException
+AppException <|-- ServiceNotFoundException
+AppException <|-- TechnicianUnavailableException
+AppException <|-- UnauthorizedOperationException
+AppException <|-- WorkloadExceededException
+IncidentService --> ServiceItemRepository : services
+IncidentService --> IncidentCategoryRepository : categories
+legend bottom left
+DESIGN NOTES
+AppException extends framework RuntimeException and carries HttpStatus.
+GlobalExceptionHandler maps domain, authorization, validation and persistence exceptions.
+DemoDataInitializer implements ApplicationRunner; Application is the Spring Boot entry point.
+
+NOTATION
++ public   # protected   - private   ~ package
+Solid hollow triangle: inheritance | Dashed hollow triangle: interface realization
+Filled diamond: composition | Hollow diamond: shared aggregation
+Arrow: stored association | Dashed arrow: dependency
+endlegend
+@enduml

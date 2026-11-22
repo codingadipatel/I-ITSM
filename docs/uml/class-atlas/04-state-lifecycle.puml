@@ -1,0 +1,108 @@
+@startuml
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam defaultFontName SansSerif
+skinparam defaultFontSize 14
+skinparam classFontSize 16
+skinparam classAttributeFontSize 13
+skinparam classBorderColor #69839D
+skinparam ArrowColor #526B83
+skinparam packageBorderColor #B4C2CF
+skinparam packageBackgroundColor #FAFCFE
+skinparam classAttributeIconSize 0
+skinparam linetype polyline
+skinparam nodesep 35
+skinparam ranksep 55
+hide empty members
+
+title I-ITSM | State pattern and legal incident transitions
+caption Source snapshot: 22 November 2026 | com.iitsm backend | Explicit members; generated accessors omitted
+package "entity" {
+class "Incident" as Incident <<JPA entity>> #EAF4FF {
+}
+}
+package "exception" {
+class "InvalidIncidentStateException" as InvalidIncidentStateException #FCE8EC {
+}
+}
+package "model" {
+enum "Status" as Status #EDF2F7 {
+}
+}
+package "service" {
+class "IncidentService" as IncidentService #F0F5F9 {
+}
+}
+package "state" {
+abstract class "AbstractIncidentState" as AbstractIncidentState #EDE9FC {
+ -status : Status
+ -targets : Set<Status>
+ --
+ +status() : Status
+ +transition(incident: Incident, target: Status) : void
+}
+class "AcknowledgedState" as AcknowledgedState #EDE9FC {
+}
+class "AssignedState" as AssignedState #EDE9FC {
+}
+class "ClassifiedState" as ClassifiedState #EDE9FC {
+}
+class "ClosedState" as ClosedState #EDE9FC {
+}
+class "InProgressState" as InProgressState #EDE9FC {
+}
+interface "IncidentState" as IncidentState #EDE9FC {
+ +status() : Status
+ +transition(incident: Incident, target: Status) : void
+}
+class "NewState" as NewState #EDE9FC {
+}
+class "ResolvedState" as ResolvedState #EDE9FC {
+}
+class "StateRegistry" as StateRegistry #EDE9FC {
+ -states : Map<Status, IncidentState>
+ --
+ +get(s: Status) : IncidentState
+}
+class "VerifiedState" as VerifiedState #EDE9FC {
+}
+}
+Incident --> Status : status
+IncidentService --> StateRegistry : states
+IncidentState <|.. AbstractIncidentState
+AbstractIncidentState --> Status : status
+AbstractIncidentState --> Status : targets
+AbstractIncidentState <|-- AcknowledgedState
+AbstractIncidentState <|-- AssignedState
+AbstractIncidentState <|-- ClassifiedState
+AbstractIncidentState <|-- ClosedState
+AbstractIncidentState <|-- InProgressState
+AbstractIncidentState <|-- NewState
+AbstractIncidentState <|-- ResolvedState
+StateRegistry --> Status : states
+AbstractIncidentState <|-- VerifiedState
+Incident ..> IncidentState : transition(state, target)
+AbstractIncidentState ..> Incident : uses
+AbstractIncidentState ..> Status : uses
+IncidentState ..> Incident : uses
+IncidentState ..> Status : uses
+StateRegistry ..> Status : uses
+AbstractIncidentState ..> Status : returns
+IncidentState ..> Status : returns
+StateRegistry ..> IncidentState : returns
+StateRegistry "1" o-- "0..*" IncidentState : states
+legend bottom left
+DESIGN NOTES
+Legal transitions from the source:
+NEW -> CLASSIFIED -> ASSIGNED -> ACKNOWLEDGED -> IN_PROGRESS -> RESOLVED -> VERIFIED -> CLOSED
+RESOLVED / VERIFIED / CLOSED -> IN_PROGRESS (reopening)
+AbstractIncidentState validates allowed successors and transition prerequisites.
+IncidentService separately enforces actor permissions and reopening justification.
+
+NOTATION
++ public   # protected   - private   ~ package
+Solid hollow triangle: inheritance | Dashed hollow triangle: interface realization
+Filled diamond: composition | Hollow diamond: shared aggregation
+Arrow: stored association | Dashed arrow: dependency
+endlegend
+@enduml

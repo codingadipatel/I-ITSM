@@ -1,0 +1,1278 @@
+@startuml
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam defaultFontName SansSerif
+skinparam defaultFontSize 14
+skinparam classFontSize 16
+skinparam classAttributeFontSize 13
+skinparam classBorderColor #69839D
+skinparam ArrowColor #526B83
+skinparam packageBorderColor #B4C2CF
+skinparam packageBackgroundColor #FAFCFE
+skinparam classAttributeIconSize 0
+skinparam linetype polyline
+skinparam nodesep 35
+skinparam ranksep 55
+hide empty members
+
+title I-ITSM | Complete class map - all application types
+caption Source snapshot: 22 November 2026 | com.iitsm backend | Explicit members; generated accessors omitted
+package "iitsm" {
+class "Application" as Application #EDF2F7 {
+ {static} +main(args: String[]) : void
+}
+}
+package "config" {
+class "DemoDataInitializer" as DemoDataInitializer #EDF2F7 {
+ -enabled : boolean
+ -password : String
+ -users : UserRepository
+ -factory : UserFactory
+ -skills : SkillRepository
+ -incidents : IncidentRepository
+ -services : ServiceItemRepository
+ -categories : IncidentCategoryRepository
+ -priorities : PriorityCalculationService
+ -assignment : AssignmentService
+ -events : IncidentEventPublisher
+ -states : StateRegistry
+ --
+ +run(args: ApplicationArguments) : void
+}
+}
+package "controller" {
+class "AuthController" as AuthController #FFF0E8 {
+ -auth : AuthService
+ --
+ +register(r: Requests.Register) : Views.Auth
+ +login(r: Requests.Login) : Views.Auth
+}
+class "CatalogController" as CatalogController #FFF0E8 {
+ -services : ServiceItemRepository
+ -categories : IncidentCategoryRepository
+ -service : CatalogService
+ -access : AccessService
+ -mapper : ViewMapper
+ --
+ +services() : List<Views.Catalog>
+ +categories() : List<Views.Catalog>
+ +createService(r: Requests.CatalogInput) : Views.Catalog
+ +service(id: Long, r: Requests.CatalogInput) : Views.Catalog
+ +createCategory(r: Requests.CatalogInput) : Views.Catalog
+ +category(id: Long, r: Requests.CatalogInput) : Views.Catalog
+}
+class "ConfigurationController" as ConfigurationController #FFF0E8 {
+ -config : ConfigurationService
+ -incidents : IncidentQueryService
+ --
+ +settings() : SystemSettings
+ +settings(r: Requests.Settings) : SystemSettings
+ +policies() : List<SlaPolicy>
+ +create(r: Requests.Policy) : SlaPolicy
+ +update(id: Long, r: Requests.Policy) : SlaPolicy
+ +violations(page: int) : org.springframework.data.domain.Page<Views.IncidentView>
+}
+class "IncidentChatController" as IncidentChatController #FFF0E8 {
+ -chat : IncidentChatService
+ --
+ +messages(id: long, technicianId: long) : List<IncidentChatService.Message>
+ +send(id: long, request: ChatMessage) : void
+}
+class "IncidentController" as IncidentController #FFF0E8 {
+ -service : IncidentService
+ -queries : IncidentQueryService
+ -assignments : AssignmentService
+ -mapper : ViewMapper
+ --
+ +list(f: Map<String, String>, page: int, size: int) : Page<Views.IncidentView>
+ +create(r: Requests.IncidentInput) : Views.IncidentView
+ +export(filters: Map<String, String>) : List<Views.IncidentView>
+ +get(id: Long) : Views.DetailView
+ +update(id: Long, r: Requests.IncidentInput) : Views.IncidentView
+ +assign(id: Long, r: Requests.Assign) : Views.IncidentView
+ +recommendations(id: Long) : List<Views.Recommendation>
+ +ack(id: Long) : Views.IncidentView
+ +investigate(id: Long) : Views.IncidentView
+ +resolve(id: Long, r: Requests.Detail) : Views.IncidentView
+ +verify(id: Long, r: Requests.Detail) : Views.IncidentView
+ +close(id: Long) : Views.IncidentView
+ +reopen(id: Long, r: Requests.Detail) : Views.IncidentView
+ +note(id: Long, r: Requests.Detail) : Map<String, Boolean>
+ +request(id: Long, r: Requests.Detail) : Map<String, Boolean>
+ +feedback(id: Long, r: Requests.Rating) : Map<String, Boolean>
+ +duplicate(id: Long, suggestionId: Long, r: Requests.Decision) : Map<String, Boolean>
+}
+class "NotificationController" as NotificationController #FFF0E8 {
+ -notifications : NotificationService
+ --
+ +list() : List<Views.NotificationView>
+ +reply(id: Long, message: ChatMessage) : void
+ +read(id: Long) : Map<String, Boolean>
+}
+class "ReportController" as ReportController #FFF0E8 {
+ -reports : ReportService
+ -audits : AuditLogRepository
+ -emails : EmailMessageRepository
+ -mapper : ViewMapper
+ --
+ +comparison(period: String, date: java.time.LocalDate) : ReportService.Comparison
+ +overview() : Map<String, Object>
+ +workload() : List<Map<String, Object>>
+ +category() : List<Map<String, Object>>
+ +service() : List<Map<String, Object>>
+ +trends() : List<Map<String, Object>>
+ +audit(page: int) : Page<Views.Audit>
+ +outbox(page: int) : Page<EmailMessage>
+ +health() : Map<String, String>
+}
+class "TechnicianController" as TechnicianController #FFF0E8 {
+ -technicians : TechnicianRepository
+ -access : AccessService
+ -assignments : AssignmentService
+ -queries : IncidentQueryService
+ -mapper : ViewMapper
+ --
+ +list() : List<Views.UserView>
+ +workload(id: Long) : Map<String, Object>
+ +recommendation(id: Long, incidentId: Long) : List<Views.Recommendation>
+}
+class "UserController" as UserController #FFF0E8 {
+ -users : UserRepository
+ -service : UserManagementService
+ -access : AccessService
+ -mapper : ViewMapper
+ --
+ +me() : Views.UserView
+ +profile(r: Requests.Profile) : Views.UserView
+ +list() : List<Views.UserView>
+ +create(r: Requests.UserInput) : Views.UserView
+ +update(id: Long, r: Requests.UserInput) : Views.UserView
+ +remove(id: Long) : void
+}
+}
+package "dto" {
+class "Requests" as Requests #F0EDFA {
+}
+class "Requests.Assign" as Requests_Assign <<record>> #F0EDFA {
+ -technicianId : Long
+ -reason : String
+}
+class "Requests.CatalogInput" as Requests_CatalogInput <<record>> #F0EDFA {
+ -name : String
+ -active : boolean
+ -criticality : int
+ -requiredSkill : String
+}
+class "Requests.ChatMessage" as Requests_ChatMessage <<record>> #F0EDFA {
+ -technicianId : long
+ -body : String
+}
+class "Requests.Decision" as Requests_Decision <<record>> #F0EDFA {
+ -decision : String
+}
+class "Requests.Detail" as Requests_Detail <<record>> #F0EDFA {
+ -details : String
+}
+class "Requests.IncidentInput" as Requests_IncidentInput <<record>> #F0EDFA {
+ -title : String
+ -description : String
+ -serviceId : Long
+ -categoryId : Long
+ -impact : int
+ -urgency : int
+ -affectedUsers : int
+}
+class "Requests.Login" as Requests_Login <<record>> #F0EDFA {
+ -email : String
+ -password : String
+}
+class "Requests.Policy" as Requests_Policy <<record>> #F0EDFA {
+ -priority : Priority
+ -responseMinutes : int
+ -resolutionMinutes : int
+}
+class "Requests.Profile" as Requests_Profile <<record>> #F0EDFA {
+ -name : String
+}
+class "Requests.Rating" as Requests_Rating <<record>> #F0EDFA {
+ -rating : int
+ -comment : String
+}
+class "Requests.Register" as Requests_Register <<record>> #F0EDFA {
+ -name : String
+ -email : String
+ -password : String
+}
+class "Requests.Settings" as Requests_Settings <<record>> #F0EDFA {
+ -assignmentStrategy : String
+ -priorityStrategy : String
+ -p1Threshold : double
+ -p2Threshold : double
+ -p3Threshold : double
+ -emailEnabled : boolean
+}
+class "Requests.UserInput" as Requests_UserInput <<record>> #F0EDFA {
+ -name : String
+ -email : String
+ -password : String
+ -role : Role
+ -active : boolean
+ -available : boolean
+ -maxWorkload : int
+ -experienceYears : int
+ -skills : Set<@NotBlank @Size(max = 80) String>
+}
+class "Views" as Views #F0EDFA {
+}
+class "Views.Audit" as Views_Audit <<record>> #F0EDFA {
+ -id : Long
+ -incidentId : Long
+ -actor : String
+ -action : String
+ -previousState : String
+ -newState : String
+ -description : String
+ -createdAt : Instant
+}
+class "Views.Auth" as Views_Auth <<record>> #F0EDFA {
+ -token : String
+ -user : UserView
+}
+class "Views.Catalog" as Views_Catalog <<record>> #F0EDFA {
+ -id : Long
+ -name : String
+ -active : boolean
+ -criticality : int
+ -requiredSkill : String
+}
+class "Views.DetailView" as Views_DetailView <<record>> #F0EDFA {
+ -incident : IncidentView
+ -notes : List<Note>
+ -history : List<Audit>
+ -duplicates : List<Duplicate>
+ -feedback : Map<String, Object>
+}
+class "Views.Duplicate" as Views_Duplicate <<record>> #F0EDFA {
+ -id : Long
+ -incidentId : Long
+ -relatedId : Long
+ -relatedTitle : String
+ -score : double
+ -decision : String
+}
+class "Views.IncidentView" as Views_IncidentView <<record>> #F0EDFA {
+ -id : Long
+ -version : long
+ -title : String
+ -description : String
+ -reporter : UserView
+ -technician : UserView
+ -service : Catalog
+ -category : Catalog
+ -impact : int
+ -urgency : int
+ -affectedUsers : int
+ -priority : Priority
+ -priorityScore : double
+ -priorityReason : String
+ -assignmentReason : String
+ -status : Status
+ -createdAt : Instant
+ -updatedAt : Instant
+ -responseDeadline : Instant
+ -resolutionDeadline : Instant
+ -acknowledgedAt : Instant
+ -resolvedAt : Instant
+ -verifiedAt : Instant
+ -closedAt : Instant
+ -resolutionDetails : String
+ -verificationDetails : String
+ -slaLevel : SlaLevel
+ -responseViolated : boolean
+ -resolutionViolated : boolean
+}
+class "Views.Note" as Views_Note <<record>> #F0EDFA {
+ -id : Long
+ -author : UserView
+ -content : String
+ -informationRequest : boolean
+ -createdAt : Instant
+}
+class "Views.NotificationConversation" as Views_NotificationConversation <<record>> #F0EDFA {
+ -technicianId : long
+ -participantName : String
+ -canReply : boolean
+}
+class "Views.NotificationView" as Views_NotificationView <<record>> #F0EDFA {
+ -id : Long
+ -incidentId : Long
+ -eventType : String
+ -message : String
+ -read : boolean
+ -createdAt : Instant
+ -conversation : NotificationConversation
+}
+class "Views.Recommendation" as Views_Recommendation <<record>> #F0EDFA {
+ -technicianId : Long
+ -technicianName : String
+ -reason : String
+ -score : double
+}
+class "Views.UserView" as Views_UserView <<record>> #F0EDFA {
+ -id : Long
+ -name : String
+ -email : String
+ -role : Role
+ -active : boolean
+ -available : boolean
+ -maxWorkload : int
+ -experienceYears : int
+ -skills : Set<String>
+}
+}
+package "entity" {
+class "Administrator" as Administrator <<JPA entity>> #EAF4FF {
+ +getRole() : Role
+}
+class "Assignment" as Assignment <<JPA entity>> #EAF4FF {
+ -id : Long
+ -incident : Incident
+ -technician : Technician
+ -assignedBy : User
+ -reason : String
+ -createdAt : Instant
+}
+class "AuditLog" as AuditLog <<JPA entity>> #EAF4FF {
+ -id : Long
+ -incident : Incident
+ -actor : User
+ -action : String
+ -previousState : String
+ -newState : String
+ -description : String
+ -createdAt : Instant
+}
+abstract class "CatalogItem" as CatalogItem #EAF4FF {
+ -id : Long
+ -name : String
+ -active : boolean
+ --
+ +update(name: String, active: boolean) : void
+}
+class "DuplicateSuggestion" as DuplicateSuggestion <<JPA entity>> #EAF4FF {
+ -id : Long
+ -incident : Incident
+ -related : Incident
+ -score : double
+ -decision : String
+ -reviewedBy : User
+ -reviewedAt : Instant
+ --
+ +review(user: User, decision: String) : void
+}
+class "EmailMessage" as EmailMessage <<JPA entity>> #EAF4FF {
+ -id : Long
+ -recipient : String
+ -subject : String
+ -body : String
+ -deliveryStatus : String
+ -createdAt : Instant
+ -sentAt : Instant
+}
+class "Employee" as Employee <<JPA entity>> #EAF4FF {
+ +getRole() : Role
+}
+class "Feedback" as Feedback <<JPA entity>> #EAF4FF {
+ -id : Long
+ -incident : Incident
+ -rating : int
+ -comment : String
+ -createdAt : Instant
+}
+class "Incident" as Incident <<JPA entity>> #EAF4FF {
+ -id : Long
+ -version : long
+ -title : String
+ -description : String
+ -reporter : User
+ -technician : Technician
+ -service : ServiceItem
+ -category : IncidentCategory
+ -impact : int
+ -urgency : int
+ -affectedUsers : int
+ -priorityScore : double
+ -priority : Priority
+ -priorityReason : String
+ -assignmentReason : String
+ -status : Status
+ -slaPolicy : SlaPolicy
+ -sla : SlaTracking
+ -createdAt : Instant
+ -updatedAt : Instant
+ -verifiedAt : Instant
+ -closedAt : Instant
+ -resolutionDetails : String
+ -verificationDetails : String
+ --
+ +revise(title: String,\n    description: String,\n    service: ServiceItem,\n    category: IncidentCategory,\n    impact: int,\n    urgency: int,\n    users: int) : void
+ +prioritize(p: Priority, score: double, reason: String, policy: SlaPolicy) : void
+ +assign(tech: Technician, reason: String) : void
+ +transition(state: IncidentState, target: Status) : void
+ +acknowledge(now: Instant) : void
+ +resolve(detail: String, now: Instant) : void
+ +verify(detail: String, now: Instant) : void
+ +close(now: Instant) : void
+ +reopen() : void
+ +touch() : void
+}
+class "IncidentCategory" as IncidentCategory <<JPA entity>> #EAF4FF {
+ -requiredSkill : String
+ --
+ +configure(skill: String) : void
+}
+class "IncidentNote" as IncidentNote <<JPA entity>> #EAF4FF {
+ -id : Long
+ -incident : Incident
+ -author : User
+ -content : String
+ -informationRequest : boolean
+ -createdAt : Instant
+}
+class "Notification" as Notification <<JPA entity>> #EAF4FF {
+ -id : Long
+ -recipient : User
+ -incident : Incident
+ -eventType : String
+ -message : String
+ -read : boolean
+ -createdAt : Instant
+ --
+ +markRead() : void
+}
+class "ServiceItem" as ServiceItem <<JPA entity>> #EAF4FF {
+ -criticality : int
+ -requiredSkill : String
+ --
+ +configure(c: int, s: String) : void
+}
+class "Skill" as Skill <<JPA entity>> #EAF4FF {
+ -id : Long
+ -name : String
+}
+class "SlaPolicy" as SlaPolicy <<JPA entity>> #EAF4FF {
+ -id : Long
+ -priority : Priority
+ -responseMinutes : int
+ -resolutionMinutes : int
+ --
+ +configure(r: int, s: int) : void
+}
+class "SlaTracking" as SlaTracking <<embedded>> #EAF4FF {
+ -responseDeadline : Instant
+ -resolutionDeadline : Instant
+ -acknowledgedAt : Instant
+ -resolvedAt : Instant
+ -responseViolated : boolean
+ -resolutionViolated : boolean
+ -warningLevel : SlaLevel
+ --
+ +plan(created: Instant, policy: SlaPolicy) : void
+ +acknowledge(now: Instant) : void
+ +resolve(now: Instant) : void
+ +reopen() : void
+ +detect(now: Instant) : SlaLevel
+}
+class "SystemSettings" as SystemSettings <<JPA entity>> #EAF4FF {
+ -id : Long
+ -assignmentStrategy : String
+ -priorityStrategy : String
+ -p1Threshold : double
+ -p2Threshold : double
+ -p3Threshold : double
+ -emailEnabled : boolean
+ --
+ +configure(assignment: String, priority: String, p1: double, p2: double, p3: double, email: boolean) : void
+}
+class "Technician" as Technician <<JPA entity>> #EAF4FF {
+ -available : boolean
+ -maxWorkload : int
+ -experienceYears : int
+ -skills : Set<Skill>
+ --
+ +getRole() : Role
+ +configure(available: boolean, maximum: int, experience: int, skills: Set<Skill>) : void
+ +getSkills() : Set<Skill>
+}
+abstract class "User" as User <<JPA entity>> #EAF4FF {
+ -id : Long
+ -email : String
+ -passwordHash : String
+ -name : String
+ -active : boolean
+ -createdAt : Instant
+ --
+ {abstract} +getRole() : Role
+ +update(name: String, active: boolean) : void
+}
+}
+package "exception" {
+class "AppException" as AppException #FCE8EC {
+ -status : HttpStatus
+}
+class "GlobalExceptionHandler" as GlobalExceptionHandler #FCE8EC {
+ ~app(e: AppException) : ResponseEntity<?>
+ ~bad(e: Exception) : ResponseEntity<?>
+ ~validation(e: MethodArgumentNotValidException) : ResponseEntity<?>
+ ~denied() : ResponseEntity<?>
+ ~conflict() : ResponseEntity<?>
+ ~internal(e: Exception) : ResponseEntity<?>
+ -error(s: HttpStatus, m: String) : ResponseEntity<?>
+}
+class "IncidentNotFoundException" as IncidentNotFoundException #FCE8EC {
+}
+class "InvalidIncidentStateException" as InvalidIncidentStateException #FCE8EC {
+}
+class "SLAConfigurationNotFoundException" as SLAConfigurationNotFoundException #FCE8EC {
+}
+class "ServiceNotFoundException" as ServiceNotFoundException #FCE8EC {
+}
+class "TechnicianUnavailableException" as TechnicianUnavailableException #FCE8EC {
+}
+class "UnauthorizedOperationException" as UnauthorizedOperationException #FCE8EC {
+}
+class "WorkloadExceededException" as WorkloadExceededException #FCE8EC {
+}
+}
+package "factory" {
+class "UserFactory" as UserFactory #FFF2D6 {
+ -encoder : PasswordEncoder
+ --
+ +create(role: Role, name: String, email: String, password: String) : User
+}
+}
+package "mapper" {
+class "ViewMapper" as ViewMapper #F0EDFA {
+ +user(u: User) : UserView
+ +service(s: ServiceItem) : Catalog
+ +category(c: IncidentCategory) : Catalog
+ +incident(i: Incident) : IncidentView
+ +audit(a: AuditLog) : Audit
+ +note(n: IncidentNote) : Note
+ +duplicate(d: DuplicateSuggestion, current: Long) : Duplicate
+ +notification(n: Notification, conversation: NotificationConversation) : NotificationView
+}
+}
+package "model" {
+enum "Priority" as Priority #EDF2F7 {
+ P1
+ P2
+ P3
+ P4
+}
+enum "Role" as Role #EDF2F7 {
+ EMPLOYEE
+ TECHNICIAN
+ ADMIN
+}
+enum "SlaLevel" as SlaLevel #EDF2F7 {
+ SAFE
+ APPROACHING
+ AT_RISK
+ VIOLATED
+}
+enum "Status" as Status #EDF2F7 {
+ NEW
+ CLASSIFIED
+ ASSIGNED
+ ACKNOWLEDGED
+ IN_PROGRESS
+ RESOLVED
+ VERIFIED
+ CLOSED
+}
+}
+package "observer" {
+class "AuditObserver" as AuditObserver #E3F5EC {
+ -repository : AuditLogRepository
+ --
+ +onEvent(e: IncidentEvent) : void
+}
+class "InAppNotificationChannel" as InAppNotificationChannel #E3F5EC {
+ -repository : NotificationRepository
+ --
+ +deliver(u: User, i: Incident, t: String, m: String) : void
+}
+class "IncidentEvent" as IncidentEvent <<record>> #E3F5EC {
+ -incident : Incident
+ -actor : User
+ -action : String
+ -previousState : String
+ -newState : String
+ -description : String
+ -statusBefore : Status
+ -statusAfter : Status
+ --
+ +statusChanged() : boolean
+}
+interface "IncidentEventListener" as IncidentEventListener #E3F5EC {
+ +onEvent(event: IncidentEvent) : void
+}
+class "IncidentEventPublisher" as IncidentEventPublisher #E3F5EC {
+ -observers : List<IncidentEventListener>
+ --
+ +publish(e: IncidentEvent) : void
+}
+interface "NotificationChannel" as NotificationChannel #E3F5EC {
+ +deliver(recipient: User, incident: Incident, type: String, message: String) : void
+}
+class "NotificationObserver" as NotificationObserver #E3F5EC {
+ -inApp : InAppNotificationChannel
+ -users : UserRepository
+ --
+ +onEvent(e: IncidentEvent) : void
+}
+}
+package "repository" {
+interface "AssignmentRepository" as AssignmentRepository #EAF4EE {
+ +findByIncidentIdOrderByCreatedAtAsc(id: Long) : java.util.List<Assignment>
+}
+interface "AuditLogRepository" as AuditLogRepository #EAF4EE {
+ +findByIncidentIdOrderByCreatedAtAsc(id: Long) : java.util.List<AuditLog>
+}
+interface "DuplicateSuggestionRepository" as DuplicateSuggestionRepository #EAF4EE {
+ +findByIncidentIdOrRelatedId(incidentId: Long, relatedId: Long) : java.util.List<DuplicateSuggestion>
+}
+interface "EmailMessageRepository" as EmailMessageRepository #EAF4EE {
+}
+interface "FeedbackRepository" as FeedbackRepository #EAF4EE {
+ +findByIncidentId(id: Long) : java.util.Optional<Feedback>
+}
+interface "IncidentCategoryRepository" as IncidentCategoryRepository #EAF4EE {
+}
+interface "IncidentNoteRepository" as IncidentNoteRepository #EAF4EE {
+ +findByIncidentIdOrderByCreatedAtAsc(id: Long) : java.util.List<IncidentNote>
+}
+interface "IncidentRepository" as IncidentRepository #EAF4EE {
+ +findByCreatedAtAfter(date: java.time.Instant) : java.util.List<Incident>
+ +findLockedById(id: Long) : java.util.Optional<Incident>
+ +countByTechnicianIdAndCategoryIdAndStatusIn(technicianId: Long, categoryId: Long, statuses: java.util.Collection<com.iitsm.model.Status>) : long
+ +countByTechnicianIdAndStatusNotIn(id: Long, statuses: java.util.Collection<com.iitsm.model.Status>) : long
+}
+interface "NotificationRepository" as NotificationRepository #EAF4EE {
+ +findByRecipientIdOrderByCreatedAtDesc(id: Long) : java.util.List<Notification>
+}
+interface "ServiceItemRepository" as ServiceItemRepository #EAF4EE {
+}
+interface "SkillRepository" as SkillRepository #EAF4EE {
+ +findByNameIgnoreCase(name: String) : java.util.Optional<Skill>
+}
+interface "SlaPolicyRepository" as SlaPolicyRepository #EAF4EE {
+ +findByPriority(priority: com.iitsm.model.Priority) : java.util.Optional<SlaPolicy>
+}
+interface "SystemSettingsRepository" as SystemSettingsRepository #EAF4EE {
+}
+interface "TechnicianRepository" as TechnicianRepository #EAF4EE {
+ +findLockedById(id: Long) : java.util.Optional<Technician>
+}
+interface "UserRepository" as UserRepository #EAF4EE {
+ +findByEmailIgnoreCase(email: String) : java.util.Optional<User>
+ +existsByEmailIgnoreCase(email: String) : boolean
+}
+}
+package "scheduler" {
+class "EmailScheduler" as EmailScheduler #E3F5EC {
+ -outbox : SmtpOutboxService
+ -configured : boolean
+ --
+ +sendPendingEmail() : void
+}
+class "SlaScheduler" as SlaScheduler #E3F5EC {
+ -monitor : SlaMonitoringService
+ --
+ +monitor() : void
+}
+}
+package "security" {
+class "AccessService" as AccessService #FCE8EC {
+ -users : UserRepository
+ --
+ +current() : User
+ +read(u: User, i: Incident) : void
+ +technician(u: User, i: Incident) : void
+ +reporter(u: User, i: Incident) : void
+ +admin(u: User) : void
+}
+class "JwtFilter" as JwtFilter #FCE8EC {
+ -jwt : JwtService
+ -users : UserRepository
+ --
+ #doFilterInternal(request: HttpServletRequest, response: HttpServletResponse, chain: FilterChain) : void
+}
+class "JwtService" as JwtService #FCE8EC {
+ -key : SecretKey
+ --
+ +issue(email: String) : String
+ +subject(token: String) : String
+}
+class "SecurityConfig" as SecurityConfig #FCE8EC {
+ ~passwordEncoder() : PasswordEncoder
+ ~filterChain(http: HttpSecurity, filter: JwtFilter, origins: String) : SecurityFilterChain
+}
+}
+package "service" {
+class "AssignmentService" as AssignmentService #F0F5F9 {
+ -strategies : Map<String, TechnicianAssignmentStrategy>
+ -technicians : TechnicianRepository
+ -incidents : IncidentRepository
+ -assignments : AssignmentRepository
+ -config : ConfigurationService
+ -events : IncidentEventPublisher
+ -states : StateRegistry
+ --
+ +workload(id: Long) : long
+ +recommend(i: Incident) : Optional<TechnicianAssignmentStrategy.Recommendation>
+ +autoAssign(i: Incident, actor: User) : void
+ +assign(i: Incident, technicianId: Long, actor: User, reason: String) : void
+}
+class "AuthService" as AuthService #F0F5F9 {
+ -users : UserRepository
+ -factory : UserFactory
+ -encoder : PasswordEncoder
+ -jwt : JwtService
+ -mapper : ViewMapper
+ --
+ +register(r: Requests.Register) : Views.Auth
+ +login(r: Requests.Login) : Views.Auth
+}
+class "CatalogService" as CatalogService #F0F5F9 {
+ -services : ServiceItemRepository
+ -categories : IncidentCategoryRepository
+ -access : AccessService
+ -events : IncidentEventPublisher
+ --
+ +service(id: Long, r: Requests.CatalogInput) : ServiceItem
+ +category(id: Long, r: Requests.CatalogInput) : IncidentCategory
+}
+class "ConfigurationService" as ConfigurationService #F0F5F9 {
+ -settings : SystemSettingsRepository
+ -policies : SlaPolicyRepository
+ -access : AccessService
+ -events : IncidentEventPublisher
+ --
+ +settings() : SystemSettings
+ +update(r: Requests.Settings) : SystemSettings
+ +policies() : List<SlaPolicy>
+ +policy(id: Long, r: Requests.Policy) : SlaPolicy
+}
+class "DuplicateDetectionService" as DuplicateDetectionService #F0F5F9 {
+ -incidents : IncidentRepository
+ -duplicates : DuplicateSuggestionRepository
+ --
+ {static} +similarity(a: String, b: String) : double
+ {static} -tokens(text: String) : Set<String>
+ +detect(i: Incident) : void
+}
+class "IncidentChatService" as IncidentChatService #F0F5F9 {
+ -incidents : IncidentRepository
+ -access : AccessService
+ -db : JdbcTemplate
+ -notifications : InAppNotificationChannel
+ --
+ -partner(incident: Incident, actor: User) : User
+ +conversation(incident: Incident, actor: User) : NotificationConversation
+ -requireParticipant(incident: Incident, actor: User) : User
+ +messages(id: long, expectedTechnicianId: long) : List<Message>
+ +send(id: long, expectedTechnicianId: long, body: String, sourceNotificationId: Long) : void
+}
+class "IncidentChatService.Message" as IncidentChatService_Message <<record>> #F0F5F9 {
+ -id : long
+ -senderId : long
+ -sender : String
+ -body : String
+ -sentAt : Instant
+ -notificationReply : boolean
+}
+class "IncidentEmailService" as IncidentEmailService #F0F5F9 {
+ -db : JdbcTemplate
+ -settings : SystemSettingsRepository
+ -recipientOverrides : Map<String, String>
+ --
+ +enabled() : boolean
+ +onEvent(event: IncidentEvent) : void
+ +queueSlaReminders(incident: Incident, now: Instant) : void
+ -queueMilestones(incident: Incident, technician: User, clock: String, deadline: Instant, now: Instant) : void
+ -queue(recipient: User, subject: String, body: String, key: String, expiresAt: Instant) : void
+ {static} -label(status: Status) : String
+}
+class "IncidentQueryService" as IncidentQueryService #F0F5F9 {
+ -incidents : IncidentRepository
+ -notes : IncidentNoteRepository
+ -audits : AuditLogRepository
+ -duplicates : DuplicateSuggestionRepository
+ -feedback : FeedbackRepository
+ -access : AccessService
+ -mapper : ViewMapper
+ --
+ +find(id: Long) : Incident
+ {static} +visible(u: User) : Specification<Incident>
+ -filters(f: Map<String, String>) : Specification<Incident>
+ +export(f: Map<String, String>) : List<IncidentView>
+ +search(f: Map<String, String>, page: int, size: int) : Page<IncidentView>
+ +detail(id: Long) : DetailView
+}
+class "IncidentService" as IncidentService #F0F5F9 {
+ -incidents : IncidentRepository
+ -services : ServiceItemRepository
+ -categories : IncidentCategoryRepository
+ -notes : IncidentNoteRepository
+ -feedback : FeedbackRepository
+ -duplicates : DuplicateSuggestionRepository
+ -access : AccessService
+ -priority : PriorityCalculationService
+ -assignment : AssignmentService
+ -detector : DuplicateDetectionService
+ -events : IncidentEventPublisher
+ -states : StateRegistry
+ --
+ -locked(id: Long) : Incident
+ -service(id: Long) : ServiceItem
+ -category(id: Long) : IncidentCategory
+ -event(i: Incident, actor: User, action: String, before: String, details: String) : void
+ +create(r: IncidentInput) : Incident
+ +update(id: Long, r: IncidentInput) : Incident
+ +assign(id: Long, r: Assign) : Incident
+ +transition(id: Long, action: String, details: String) : Incident
+ +note(id: Long, r: Detail, request: boolean) : void
+ +feedback(id: Long, r: Rating) : void
+ +review(id: Long, suggestionId: Long, decision: String) : void
+}
+class "NotificationService" as NotificationService #F0F5F9 {
+ -notifications : NotificationRepository
+ -access : AccessService
+ -mapper : ViewMapper
+ -chat : IncidentChatService
+ --
+ +list() : List<Views.NotificationView>
+ +read(id: Long) : void
+ +reply(id: Long, message: ChatMessage) : void
+ -ownedNotification(id: Long, actor: User) : Notification
+}
+class "PriorityCalculationService" as PriorityCalculationService #F0F5F9 {
+ -strategies : Map<String, PriorityStrategy>
+ -config : ConfigurationService
+ -policies : SlaPolicyRepository
+ --
+ +calculate(i: Incident) : void
+}
+class "ReportService" as ReportService #F0F5F9 {
+ -incidents : IncidentRepository
+ -technicians : TechnicianRepository
+ -access : AccessService
+ -assignments : AssignmentService
+ --
+ -visible() : List<Incident>
+ +comparison(period: String, date: LocalDate) : Comparison
+ +overview() : Map<String, Object>
+ -group(list: List<Incident>, key: Function<Incident, String>) : List<Map<String, Object>>
+ +category() : List<Map<String, Object>>
+ +service() : List<Map<String, Object>>
+ +trends() : List<Map<String, Object>>
+ +workload() : List<Map<String, Object>>
+}
+class "ReportService.Comparison" as ReportService_Comparison <<record>> #F0F5F9 {
+ -previousStart : LocalDate
+ -selectedStart : LocalDate
+ -endExclusive : LocalDate
+ -total : Counts
+ -technicians : List<TechnicianCounts>
+}
+class "ReportService.Counts" as ReportService_Counts <<record>> #F0F5F9 {
+ -previous : long
+ -selected : long
+ --
+ ~add(current: boolean) : Counts
+}
+class "ReportService.TechnicianCounts" as ReportService_TechnicianCounts <<record>> #F0F5F9 {
+ -id : Long
+ -name : String
+ -counts : Counts
+}
+class "SlaMonitoringService" as SlaMonitoringService #F0F5F9 {
+ -incidents : IncidentRepository
+ -events : IncidentEventPublisher
+ -email : IncidentEmailService
+ --
+ +scan() : void
+ +scanAt(now: Instant) : void
+}
+class "SmtpOutboxService" as SmtpOutboxService #F0F5F9 {
+ {static} -log : Logger
+ {static} -MAX_ATTEMPTS : int
+ -db : JdbcTemplate
+ -sender : JavaMailSender
+ -from : String
+ --
+ +deliverNext() : boolean
+}
+class "SmtpOutboxService.Pending" as SmtpOutboxService_Pending <<record>> #F0F5F9 {
+ -id : long
+ -recipient : String
+ -subject : String
+ -body : String
+ -attempts : int
+ -expired : boolean
+}
+class "UserManagementService" as UserManagementService #F0F5F9 {
+ -users : UserRepository
+ -skills : SkillRepository
+ -factory : UserFactory
+ -access : AccessService
+ -events : IncidentEventPublisher
+ --
+ -skills(names: Set<String>) : Set<Skill>
+ +save(id: Long, r: Requests.UserInput) : User
+ +deactivate(id: Long) : void
+ +profile(r: Requests.Profile) : User
+}
+}
+package "state" {
+abstract class "AbstractIncidentState" as AbstractIncidentState #EDE9FC {
+ -status : Status
+ -targets : Set<Status>
+ --
+ +status() : Status
+ +transition(incident: Incident, target: Status) : void
+}
+class "AcknowledgedState" as AcknowledgedState #EDE9FC {
+}
+class "AssignedState" as AssignedState #EDE9FC {
+}
+class "ClassifiedState" as ClassifiedState #EDE9FC {
+}
+class "ClosedState" as ClosedState #EDE9FC {
+}
+class "InProgressState" as InProgressState #EDE9FC {
+}
+interface "IncidentState" as IncidentState #EDE9FC {
+ +status() : Status
+ +transition(incident: Incident, target: Status) : void
+}
+class "NewState" as NewState #EDE9FC {
+}
+class "ResolvedState" as ResolvedState #EDE9FC {
+}
+class "StateRegistry" as StateRegistry #EDE9FC {
+ -states : Map<Status, IncidentState>
+ --
+ +get(s: Status) : IncidentState
+}
+class "VerifiedState" as VerifiedState #EDE9FC {
+}
+}
+package "strategy" {
+class "LoadBasedAssignmentStrategy" as LoadBasedAssignmentStrategy #FFF2D6 {
+ +key() : String
+ +recommend(incident: Incident, candidates: List<Candidate>) : Optional<Recommendation>
+}
+interface "PriorityStrategy" as PriorityStrategy #FFF2D6 {
+ +key() : String
+ +calculate(incident: Incident, settings: SystemSettings) : Result
+ +result(score: double, s: SystemSettings, reason: String) : Result
+}
+class "PriorityStrategy.Result" as PriorityStrategy_Result <<record>> #FFF2D6 {
+ -priority : Priority
+ -score : double
+ -reason : String
+}
+class "RuleBasedPriorityStrategy" as RuleBasedPriorityStrategy #FFF2D6 {
+ +key() : String
+ +calculate(i: Incident, s: SystemSettings) : Result
+}
+class "SkillBasedAssignmentStrategy" as SkillBasedAssignmentStrategy #FFF2D6 {
+ +key() : String
+ +recommend(i: Incident, candidates: List<Candidate>) : Optional<Recommendation>
+}
+interface "TechnicianAssignmentStrategy" as TechnicianAssignmentStrategy #FFF2D6 {
+ +key() : String
+ +recommend(incident: Incident, candidates: List<Candidate>) : Optional<Recommendation>
+}
+class "TechnicianAssignmentStrategy.Candidate" as TechnicianAssignmentStrategy_Candidate <<record>> #FFF2D6 {
+ -technician : Technician
+ -workload : long
+ -resolvedInCategory : int
+ --
+ +eligible() : boolean
+}
+class "TechnicianAssignmentStrategy.Recommendation" as TechnicianAssignmentStrategy_Recommendation <<record>> #FFF2D6 {
+ -technician : Technician
+ -reason : String
+ -score : double
+}
+class "WeightedPriorityStrategy" as WeightedPriorityStrategy #FFF2D6 {
+ +key() : String
+ +calculate(i: Incident, s: SystemSettings) : Result
+}
+}
+DemoDataInitializer --> UserRepository : users
+DemoDataInitializer --> UserFactory : factory
+DemoDataInitializer --> SkillRepository : skills
+DemoDataInitializer --> IncidentRepository : incidents
+DemoDataInitializer --> ServiceItemRepository : services
+DemoDataInitializer --> IncidentCategoryRepository : categories
+DemoDataInitializer --> PriorityCalculationService : priorities
+DemoDataInitializer --> AssignmentService : assignment
+DemoDataInitializer --> IncidentEventPublisher : events
+DemoDataInitializer --> StateRegistry : states
+AuthController --> AuthService : auth
+CatalogController --> ServiceItemRepository : services
+CatalogController --> IncidentCategoryRepository : categories
+CatalogController --> CatalogService : service
+CatalogController --> AccessService : access
+CatalogController --> ViewMapper : mapper
+ConfigurationController --> ConfigurationService : config
+ConfigurationController --> IncidentQueryService : incidents
+IncidentChatController --> IncidentChatService : chat
+IncidentController --> IncidentService : service
+IncidentController --> IncidentQueryService : queries
+IncidentController --> AssignmentService : assignments
+IncidentController --> ViewMapper : mapper
+NotificationController --> NotificationService : notifications
+ReportController --> ReportService : reports
+ReportController --> AuditLogRepository : audits
+ReportController --> EmailMessageRepository : emails
+ReportController --> ViewMapper : mapper
+TechnicianController --> TechnicianRepository : technicians
+TechnicianController --> AccessService : access
+TechnicianController --> AssignmentService : assignments
+TechnicianController --> IncidentQueryService : queries
+TechnicianController --> ViewMapper : mapper
+UserController --> UserRepository : users
+UserController --> UserManagementService : service
+UserController --> AccessService : access
+UserController --> ViewMapper : mapper
+Requests_UserInput --> Role : role
+Requests_Policy --> Priority : priority
+Views_UserView --> Role : role
+Views_Auth --> Views_UserView : user
+Views_IncidentView --> Views_UserView : reporter
+Views_IncidentView --> Views_UserView : technician
+Views_IncidentView --> Views_Catalog : service
+Views_IncidentView --> Views_Catalog : category
+Views_IncidentView --> Priority : priority
+Views_IncidentView --> Status : status
+Views_IncidentView --> SlaLevel : slaLevel
+Views_Note --> Views_UserView : author
+Views_NotificationView --> Views_NotificationConversation : conversation
+Views_DetailView --> Views_IncidentView : incident
+Views_DetailView --> Views_Note : notes
+Views_DetailView --> Views_Audit : history
+Views_DetailView --> Views_Duplicate : duplicates
+User <|-- Administrator
+User <|-- Employee
+Incident --> Priority : priority
+Incident --> Status : status
+CatalogItem <|-- IncidentCategory
+CatalogItem <|-- ServiceItem
+SlaPolicy --> Priority : priority
+SlaTracking --> SlaLevel : warningLevel
+User <|-- Technician
+AppException <|-- IncidentNotFoundException
+AppException <|-- InvalidIncidentStateException
+AppException <|-- SLAConfigurationNotFoundException
+AppException <|-- ServiceNotFoundException
+AppException <|-- TechnicianUnavailableException
+AppException <|-- UnauthorizedOperationException
+AppException <|-- WorkloadExceededException
+IncidentEventListener <|.. AuditObserver
+AuditObserver --> AuditLogRepository : repository
+NotificationChannel <|.. InAppNotificationChannel
+InAppNotificationChannel --> NotificationRepository : repository
+IncidentEvent --> Incident : incident
+IncidentEvent --> User : actor
+IncidentEvent --> Status : statusBefore
+IncidentEvent --> Status : statusAfter
+IncidentEventListener <|.. NotificationObserver
+NotificationObserver --> InAppNotificationChannel : inApp
+NotificationObserver --> UserRepository : users
+EmailScheduler --> SmtpOutboxService : outbox
+SlaScheduler --> SlaMonitoringService : monitor
+AccessService --> UserRepository : users
+JwtFilter --> JwtService : jwt
+JwtFilter --> UserRepository : users
+AssignmentService --> TechnicianRepository : technicians
+AssignmentService --> IncidentRepository : incidents
+AssignmentService --> AssignmentRepository : assignments
+AssignmentService --> ConfigurationService : config
+AssignmentService --> IncidentEventPublisher : events
+AssignmentService --> StateRegistry : states
+AuthService --> UserRepository : users
+AuthService --> UserFactory : factory
+AuthService --> JwtService : jwt
+AuthService --> ViewMapper : mapper
+CatalogService --> ServiceItemRepository : services
+CatalogService --> IncidentCategoryRepository : categories
+CatalogService --> AccessService : access
+CatalogService --> IncidentEventPublisher : events
+ConfigurationService --> SystemSettingsRepository : settings
+ConfigurationService --> SlaPolicyRepository : policies
+ConfigurationService --> AccessService : access
+ConfigurationService --> IncidentEventPublisher : events
+DuplicateDetectionService --> IncidentRepository : incidents
+DuplicateDetectionService --> DuplicateSuggestionRepository : duplicates
+IncidentChatService --> IncidentRepository : incidents
+IncidentChatService --> AccessService : access
+IncidentChatService --> InAppNotificationChannel : notifications
+IncidentEventListener <|.. IncidentEmailService
+IncidentEmailService --> SystemSettingsRepository : settings
+IncidentQueryService --> IncidentRepository : incidents
+IncidentQueryService --> IncidentNoteRepository : notes
+IncidentQueryService --> AuditLogRepository : audits
+IncidentQueryService --> DuplicateSuggestionRepository : duplicates
+IncidentQueryService --> FeedbackRepository : feedback
+IncidentQueryService --> AccessService : access
+IncidentQueryService --> ViewMapper : mapper
+IncidentService --> IncidentRepository : incidents
+IncidentService --> ServiceItemRepository : services
+IncidentService --> IncidentCategoryRepository : categories
+IncidentService --> IncidentNoteRepository : notes
+IncidentService --> FeedbackRepository : feedback
+IncidentService --> DuplicateSuggestionRepository : duplicates
+IncidentService --> AccessService : access
+IncidentService --> PriorityCalculationService : priority
+IncidentService --> AssignmentService : assignment
+IncidentService --> DuplicateDetectionService : detector
+IncidentService --> IncidentEventPublisher : events
+IncidentService --> StateRegistry : states
+NotificationService --> NotificationRepository : notifications
+NotificationService --> AccessService : access
+NotificationService --> ViewMapper : mapper
+NotificationService --> IncidentChatService : chat
+PriorityCalculationService --> ConfigurationService : config
+PriorityCalculationService --> SlaPolicyRepository : policies
+ReportService --> IncidentRepository : incidents
+ReportService --> TechnicianRepository : technicians
+ReportService --> AccessService : access
+ReportService --> AssignmentService : assignments
+ReportService_TechnicianCounts --> ReportService_Counts : counts
+ReportService_Comparison --> ReportService_Counts : total
+ReportService_Comparison --> ReportService_TechnicianCounts : technicians
+SlaMonitoringService --> IncidentRepository : incidents
+SlaMonitoringService --> IncidentEventPublisher : events
+SlaMonitoringService --> IncidentEmailService : email
+UserManagementService --> UserRepository : users
+UserManagementService --> SkillRepository : skills
+UserManagementService --> UserFactory : factory
+UserManagementService --> AccessService : access
+UserManagementService --> IncidentEventPublisher : events
+IncidentState <|.. AbstractIncidentState
+AbstractIncidentState --> Status : status
+AbstractIncidentState --> Status : targets
+AbstractIncidentState <|-- AcknowledgedState
+AbstractIncidentState <|-- AssignedState
+AbstractIncidentState <|-- ClassifiedState
+AbstractIncidentState <|-- ClosedState
+AbstractIncidentState <|-- InProgressState
+AbstractIncidentState <|-- NewState
+AbstractIncidentState <|-- ResolvedState
+StateRegistry --> Status : states
+AbstractIncidentState <|-- VerifiedState
+TechnicianAssignmentStrategy <|.. LoadBasedAssignmentStrategy
+PriorityStrategy_Result --> Priority : priority
+PriorityStrategy <|.. RuleBasedPriorityStrategy
+TechnicianAssignmentStrategy <|.. SkillBasedAssignmentStrategy
+TechnicianAssignmentStrategy_Candidate --> Technician : technician
+TechnicianAssignmentStrategy_Recommendation --> Technician : technician
+PriorityStrategy <|.. WeightedPriorityStrategy
+Incident "0..*" --> "1" User : reporter
+Incident "0..*" --> "0..1" Technician : technician
+Incident "0..*" --> "1" ServiceItem : service
+Incident "0..*" --> "1" IncidentCategory : category
+Incident "0..*" --> "0..1" SlaPolicy : slaPolicy
+Assignment "0..*" --> "0..1" Incident : incident
+Assignment "0..*" --> "0..1" Technician : technician
+Assignment "0..*" --> "0..1" User : assignedBy
+IncidentNote "0..*" --> "1" Incident : incident
+IncidentNote "0..*" --> "1" User : author
+AuditLog "0..*" --> "0..1" Incident : incident
+AuditLog "0..*" --> "0..1" User : actor
+Feedback "0..1" --> "1" Incident : incident
+DuplicateSuggestion "0..*" --> "0..1" Incident : incident
+DuplicateSuggestion "0..*" --> "0..1" Incident : related
+DuplicateSuggestion "0..*" --> "0..1" User : reviewedBy
+Notification "0..*" --> "1" User : recipient
+Notification "0..*" --> "0..1" Incident : incident
+Incident "1" *-- "1" SlaTracking : embedded ownership
+Technician "0..*" o-- "0..*" Skill : shared skills
+Incident ..> IncidentState : transition(state, target)
+IncidentEventPublisher ..> IncidentEvent : publishes
+UserFactory ..> Employee : creates
+UserFactory ..> Technician : creates
+UserFactory ..> Administrator : creates
+AssignmentRepository ..> Assignment : persists
+AuditLogRepository ..> AuditLog : persists
+DuplicateSuggestionRepository ..> DuplicateSuggestion : persists
+EmailMessageRepository ..> EmailMessage : persists
+FeedbackRepository ..> Feedback : persists
+IncidentCategoryRepository ..> IncidentCategory : persists
+IncidentNoteRepository ..> IncidentNote : persists
+IncidentRepository ..> Incident : persists
+NotificationRepository ..> Notification : persists
+ServiceItemRepository ..> ServiceItem : persists
+SkillRepository ..> Skill : persists
+SlaPolicyRepository ..> SlaPolicy : persists
+SystemSettingsRepository ..> SystemSettings : persists
+TechnicianRepository ..> Technician : persists
+UserRepository ..> User : persists
+AuditObserver ..> IncidentEvent : uses
+InAppNotificationChannel ..> User : uses
+InAppNotificationChannel ..> Incident : uses
+IncidentEventListener ..> IncidentEvent : uses
+IncidentEventPublisher ..> IncidentEvent : uses
+NotificationChannel ..> User : uses
+NotificationChannel ..> Incident : uses
+NotificationObserver ..> IncidentEvent : uses
+AbstractIncidentState ..> Incident : uses
+AbstractIncidentState ..> Status : uses
+IncidentState ..> Incident : uses
+IncidentState ..> Status : uses
+StateRegistry ..> Status : uses
+LoadBasedAssignmentStrategy ..> Incident : uses
+LoadBasedAssignmentStrategy ..> TechnicianAssignmentStrategy_Candidate : uses
+PriorityStrategy ..> Incident : uses
+PriorityStrategy ..> SystemSettings : uses
+RuleBasedPriorityStrategy ..> Incident : uses
+RuleBasedPriorityStrategy ..> SystemSettings : uses
+SkillBasedAssignmentStrategy ..> Incident : uses
+SkillBasedAssignmentStrategy ..> TechnicianAssignmentStrategy_Candidate : uses
+TechnicianAssignmentStrategy ..> Incident : uses
+TechnicianAssignmentStrategy ..> TechnicianAssignmentStrategy_Candidate : uses
+WeightedPriorityStrategy ..> Incident : uses
+WeightedPriorityStrategy ..> SystemSettings : uses
+AbstractIncidentState ..> Status : returns
+IncidentState ..> Status : returns
+StateRegistry ..> IncidentState : returns
+LoadBasedAssignmentStrategy ..> TechnicianAssignmentStrategy_Recommendation : returns
+PriorityStrategy ..> PriorityStrategy_Result : returns
+RuleBasedPriorityStrategy ..> PriorityStrategy_Result : returns
+SkillBasedAssignmentStrategy ..> TechnicianAssignmentStrategy_Recommendation : returns
+TechnicianAssignmentStrategy ..> TechnicianAssignmentStrategy_Recommendation : returns
+WeightedPriorityStrategy ..> PriorityStrategy_Result : returns
+IncidentEventPublisher "1" o-- "0..*" IncidentEventListener : observers
+AssignmentService "1" o-- "0..*" TechnicianAssignmentStrategy : strategies
+PriorityCalculationService "1" o-- "0..*" PriorityStrategy : strategies
+StateRegistry "1" o-- "0..*" IncidentState : states
+legend bottom left
+DESIGN NOTES
+Full graph: use the numbered detail sheets for presentation or printing.
+Only actual Java source types are represented. Framework/JDK classes are external.
+Constructors and compiler/Lombok-generated boilerplate are omitted.
+Frontend is React function components; it does not declare Java domain classes.
+
+NOTATION
++ public   # protected   - private   ~ package
+Solid hollow triangle: inheritance | Dashed hollow triangle: interface realization
+Filled diamond: composition | Hollow diamond: shared aggregation
+Arrow: stored association | Dashed arrow: dependency
+endlegend
+@enduml

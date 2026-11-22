@@ -1,0 +1,430 @@
+[
+  {
+    "path": "backend/src/main/java/com/iitsm/Application.java",
+    "sha256": "7be35cdc4da2f84fa578ad8143eee59908679fbccca73659005fb0f216bc0e96"
+  },
+  {
+    "path": "backend/src/main/java/com/iitsm/config/DemoDataInitializer.java",
+    "sha256": "9324066dd706fedaff88be8bce1cb6da4ed7fe6b31e891c8c67c7147a358bf6c"
+  },
+  {
+    "path": "backend/src/main/java/com/iitsm/controller/AuthController.java",
+    "sha256": "9303416c9c1fa12c7628a162dc7d3830d1f4c89b79319cef04b507b66d91543a"
+  },
+  {
+    "path": "backend/src/main/java/com/iitsm/controller/CatalogController.java",
+    "sha256": "ef17647872151af969b20085957213c646d215ed2ad3945e1c1dfb016ca2a975"
+  },
+  {
+    "path": "backend/src/main/java/com/iitsm/controller/ConfigurationController.java",
+    "sha256": "02942273ba02c180ca79cd01521c4b94ccc2a33f88f1dc2667eed7271285b9fa"
+  },
+  {
+    "path": "backend/src/main/java/com/iitsm/controller/IncidentChatController.java",
+    "sha256": "5053f677073bf1d3ef5c89c5c5d7747623126dd36e674d865392ee60d43fe724"
+  },
+  {
+    "path": "backend/src/main/java/com/iitsm/controller/IncidentController.java",
+    "sha256": "c27cf7e8cf4708b18f22181cc6e5ef4bbf48ea9ce845048e4e1b5669a8e827e7"
+  },
+  {
+    "path": "backend/src/main/java/com/iitsm/controller/NotificationController.java",
+    "sha256": "42ccc83f5ca7fb6805fbb6822bc8de610b540b53e4cf13768cfb81a9cb68a496"
+  },
+  {
+    "path": "backend/src/main/java/com/iitsm/controller/ReportController.java",
+    "sha256": "025063cc6e108e5ffd40586c41a1bef1dbda695b5ce057c2f5c82caba59831c0"
+  },
+  {
+    "path": "backend/src/main/java/com/iitsm/controller/TechnicianController.java",
+    "sha256": "fc090940bf9ae92354416b3b54961c0b7d7c81636fa55893d568cf617df75b09"
+  },
+  {
+    "path": "backend/src/main/java/com/iitsm/controller/UserController.java",
+    "sha256": "01bd3bd9e268071157d7f80f1dd864ab649b85753b3557425faf42777042bc95"
+  },
+  {
+    "path": "backend/src/main/java/com/iitsm/dto/Requests.java",
+    "sha256": "9a75a52e0e5f14461895ab998d1ef2ba4265f3e6958800bdd97fbbfb9b025447"
+  },
+  {
+    "path": "backend/src/main/java/com/iitsm/dto/Views.java",
+    "sha256": "8e13df5ed399732faccfae79d9d80d6437f1d27b2467971785c4755f7a46049e"
+  },
+  {
+    "path": "backend/src/main/java/com/iitsm/entity/Administrator.java",
+    "sha256": "2c3be2fab413cbf4d8d9c2a8bca069b95dcc20fd93e573630807890ac4e2f465"
+  },
+  {
+    "path": "backend/src/main/java/com/iitsm/entity/Assignment.java",
+    "sha256": "148a89f197c6656fe81e5d4100e0f81d3cde471e93179bf4141e4ea8349e404c"
+  },
+  {
+    "path": "backend/src/main/java/com/iitsm/entity/AuditLog.java",
+    "sha256": "d1d2dbd22e28f57f582db03cd1b91d0f2d3c56ceb23c405a640ebd7d3badd51a"
+  },
+  {
+    "path": "backend/src/main/java/com/iitsm/entity/CatalogItem.java",
+    "sha256": "00138230d8a4862b033b9e7b8cf9a149dfc2a3e7de130866400edf1a0c64ad57"
+  },
+  {
+    "path": "backend/src/main/java/com/iitsm/entity/DuplicateSuggestion.java",
+    "sha256": "868b5f7ebb7498077e8e47e0d88d109849113dc80b0c33467c1f6ceb2f48774c"
+  },
+  {
+    "path": "backend/src/main/java/com/iitsm/entity/EmailMessage.java",
+    "sha256": "95b46de1b2b95a0c7f22b4af0232b1ccaac073265541e64df9366483939b3e4e"
+  },
+  {
+    "path": "backend/src/main/java/com/iitsm/entity/Employee.java",
+    "sha256": "317674b3c72fcb7118bdf1bd52d222456ae2534f168b37152552009b73d991b5"
+  },
+  {
+    "path": "backend/src/main/java/com/iitsm/entity/Feedback.java",
+    "sha256": "a5fe6d544c63a18a2dc692e8d41df63bdbf380ea697fb161eda06c45dad5e80a"
+  },
+  {
+    "path": "backend/src/main/java/com/iitsm/entity/Incident.java",
+    "sha256": "2b5b7c3a74067bbbc176b218388c951c645028896d973cd8e996cefca824f434"
+  },
+  {
+    "path": "backend/src/main/java/com/iitsm/entity/IncidentCategory.java",
+    "sha256": "ca9f5bf9bf7a19267a92cd7ace22863bb766e10c8832c451dfae7708593e4012"
+  },
+  {
+    "path": "backend/src/main/java/com/iitsm/entity/IncidentNote.java",
+    "sha256": "f4c7d11c745d60360ef0fccf41d1364df8b1b457a5f3ebc6c79cf374dd9077f0"
+  },
+  {
+    "path": "backend/src/main/java/com/iitsm/entity/Notification.java",
+    "sha256": "de4ab3135c0fde70bc2efcce07d3c21aea9a6e1a6f25f88d40096b70395555b6"
+  },
+  {
+    "path": "backend/src/main/java/com/iitsm/entity/ServiceItem.java",
+    "sha256": "390dd0731cb83064c479f0bf1cf56806ad52410163db93c9190225507019c057"
+  },
+  {
+    "path": "backend/src/main/java/com/iitsm/entity/Skill.java",
+    "sha256": "2fb0ae96afcd513d76e9452c4e1c2c04cb38969ded9924cf46745eb90c413a9f"
+  },
+  {
+    "path": "backend/src/main/java/com/iitsm/entity/SlaPolicy.java",
+    "sha256": "ca3018ca71e4cfc4662eb74cbb321247e71d7f55d1ef76bfd9d1b0d329ab7de8"
+  },
+  {
+    "path": "backend/src/main/java/com/iitsm/entity/SlaTracking.java",
+    "sha256": "f5cd3530d0e4ce8528fb54d48c5e9ad5675c6997646e32b14f15a90aa212a943"
+  },
+  {
+    "path": "backend/src/main/java/com/iitsm/entity/SystemSettings.java",
+    "sha256": "1165f55e39a285793fcb70755f639d29d17c26e09624539f18cfbb66b511eb7b"
+  },
+  {
+    "path": "backend/src/main/java/com/iitsm/entity/Technician.java",
+    "sha256": "b2c4e961f66778c14e0733b17603d49630433928c0ba56f620c7aab00821333b"
+  },
+  {
+    "path": "backend/src/main/java/com/iitsm/entity/User.java",
+    "sha256": "b74798ef28a7c41199b37d09935c34c47af8a72abc18f8a7ba9e93a0231e543d"
+  },
+  {
+    "path": "backend/src/main/java/com/iitsm/exception/AppException.java",
+    "sha256": "a98c82b58c7ad3f4e7473e25bfe95f5e691b43d050b2ffdc8251f746b168c98f"
+  },
+  {
+    "path": "backend/src/main/java/com/iitsm/exception/GlobalExceptionHandler.java",
+    "sha256": "46d8b3caecafaebb4142f4bab58ecdd6186ad896391161b097b12f40e092d081"
+  },
+  {
+    "path": "backend/src/main/java/com/iitsm/exception/IncidentNotFoundException.java",
+    "sha256": "efcf587b6c024755b28620c7086c8d6c0db88c17661dc1dd440b53a48a15566f"
+  },
+  {
+    "path": "backend/src/main/java/com/iitsm/exception/InvalidIncidentStateException.java",
+    "sha256": "dac6bfea72a0a70f6b79807248a610f1c973cccb68c7643bc750f1d113602dca"
+  },
+  {
+    "path": "backend/src/main/java/com/iitsm/exception/SLAConfigurationNotFoundException.java",
+    "sha256": "7d772032e0f295fd481a41a4d53737ec89ff86b7b856985a78cd4027649616be"
+  },
+  {
+    "path": "backend/src/main/java/com/iitsm/exception/ServiceNotFoundException.java",
+    "sha256": "79d4a6d4bb2c466f566fd4a4ce1d84829bb070349bcdbc2d3d21db461b05c621"
+  },
+  {
+    "path": "backend/src/main/java/com/iitsm/exception/TechnicianUnavailableException.java",
+    "sha256": "ec2f1bdff8d378c494243dd88e5fcf002419653e800fde940cf3b92fdabe3ad0"
+  },
+  {
+    "path": "backend/src/main/java/com/iitsm/exception/UnauthorizedOperationException.java",
+    "sha256": "a52d7600d5822339a4d663b03bf0a451902ad701acbe26cee57178e1830b8eb6"
+  },
+  {
+    "path": "backend/src/main/java/com/iitsm/exception/WorkloadExceededException.java",
+    "sha256": "9ebd93ae79e79f56648bf65265a6613d6bc1ddc9c5d81e0d4d46552afd0c1210"
+  },
+  {
+    "path": "backend/src/main/java/com/iitsm/factory/UserFactory.java",
+    "sha256": "6c4d743a8864ba39e8c46243234d9f0b293333e414229aa0f38e9da839baad57"
+  },
+  {
+    "path": "backend/src/main/java/com/iitsm/mapper/ViewMapper.java",
+    "sha256": "9896d36f7973e1804bb977bf96382098081ce3d7b73d466035d54d5717e863f7"
+  },
+  {
+    "path": "backend/src/main/java/com/iitsm/model/Priority.java",
+    "sha256": "1428b5f3302ca0d98d7f34805d61b8d9bdf2ce292bf734a9668d2035dcd65846"
+  },
+  {
+    "path": "backend/src/main/java/com/iitsm/model/Role.java",
+    "sha256": "ef689d94f3b1596c1100c3e593ecd2b25e6f6b3324dd876551645c94c0d54a8f"
+  },
+  {
+    "path": "backend/src/main/java/com/iitsm/model/SlaLevel.java",
+    "sha256": "6885e8a92443fbd91c3cdf36c4f3c227b92a7a20aed80eeec4aa45d40937da05"
+  },
+  {
+    "path": "backend/src/main/java/com/iitsm/model/Status.java",
+    "sha256": "3615e249fab20dedc981cb09f8d2e1e3ac3be275fd03dd1e9696a0fb3719de35"
+  },
+  {
+    "path": "backend/src/main/java/com/iitsm/observer/AuditObserver.java",
+    "sha256": "934caf093dec74d8b01090c22eb17d95df8760f085f8f4be1e5f218acf35adc0"
+  },
+  {
+    "path": "backend/src/main/java/com/iitsm/observer/InAppNotificationChannel.java",
+    "sha256": "2499b2c4795f709018401f4208328a1dd8adabeaafa4ac3e52bee51501ea2f21"
+  },
+  {
+    "path": "backend/src/main/java/com/iitsm/observer/IncidentEvent.java",
+    "sha256": "f4f866428bf52030a5a1e52a8906708fa92ddec07a3c87eb9f5097c8139d246e"
+  },
+  {
+    "path": "backend/src/main/java/com/iitsm/observer/IncidentEventListener.java",
+    "sha256": "80bfde463dbdb7db0164c5620e16ce2a02b2bc809f8a01446fd243f72946bef3"
+  },
+  {
+    "path": "backend/src/main/java/com/iitsm/observer/IncidentEventPublisher.java",
+    "sha256": "08dba55d8b547f142e014c5d26cfff76a01f9368801254daff92a39b9e42da27"
+  },
+  {
+    "path": "backend/src/main/java/com/iitsm/observer/NotificationChannel.java",
+    "sha256": "ff65c10974dcfae74a79a219610be3fcfee93dc7a2470672cd8d2ab3f32ad4b4"
+  },
+  {
+    "path": "backend/src/main/java/com/iitsm/observer/NotificationObserver.java",
+    "sha256": "6729ec5f8d8a3be49d97ea7358135db70f5016590a79cab02b773680ef1a0771"
+  },
+  {
+    "path": "backend/src/main/java/com/iitsm/repository/AssignmentRepository.java",
+    "sha256": "c7cb5ff822fdb0bca1ba26368ce125e6e2cdfd39faf3eeb23bd0bad3d990f449"
+  },
+  {
+    "path": "backend/src/main/java/com/iitsm/repository/AuditLogRepository.java",
+    "sha256": "ec6479eec1508345864e608b2aefa3c645e784948715994b2329966a78f3c9ca"
+  },
+  {
+    "path": "backend/src/main/java/com/iitsm/repository/DuplicateSuggestionRepository.java",
+    "sha256": "53dc8e3563d5cec546aa1fd731c97cf90e1b68fa25f8dd5713426f86dc522164"
+  },
+  {
+    "path": "backend/src/main/java/com/iitsm/repository/EmailMessageRepository.java",
+    "sha256": "17d030cfd1fd94eba92e0dbf5a805d9ab42c83ead7dc3747a42aa6e484225f78"
+  },
+  {
+    "path": "backend/src/main/java/com/iitsm/repository/FeedbackRepository.java",
+    "sha256": "1be72568e9595c18b94f69bcea8088beb2e397b7dc07881932ee39db3cb45efc"
+  },
+  {
+    "path": "backend/src/main/java/com/iitsm/repository/IncidentCategoryRepository.java",
+    "sha256": "36ebf7ed2d093d6ca36dc82d74f570e8b9486c490a824c261b211fab5b2fbe3f"
+  },
+  {
+    "path": "backend/src/main/java/com/iitsm/repository/IncidentNoteRepository.java",
+    "sha256": "874892634821cf59c506e36c4c90a9c33b91478ea77e657c2d4fa2187966d6c1"
+  },
+  {
+    "path": "backend/src/main/java/com/iitsm/repository/IncidentRepository.java",
+    "sha256": "240606b441728862ebf64f03651f91596cd4f094149471eaf39b2d75fbf816ae"
+  },
+  {
+    "path": "backend/src/main/java/com/iitsm/repository/NotificationRepository.java",
+    "sha256": "f43b18021f47164410fb62340ce321fa2a9b0effe90999ab5a02158ccd7464db"
+  },
+  {
+    "path": "backend/src/main/java/com/iitsm/repository/ServiceItemRepository.java",
+    "sha256": "bdaabd6e4ae8bebd8a2148813101ce5f8fa8834f8af1c669020faa0dc1e61491"
+  },
+  {
+    "path": "backend/src/main/java/com/iitsm/repository/SkillRepository.java",
+    "sha256": "faaed078af4e437e118d959ddaba67ed97e714cb22fed9a8e2062039a5588e15"
+  },
+  {
+    "path": "backend/src/main/java/com/iitsm/repository/SlaPolicyRepository.java",
+    "sha256": "c7d3e8959f6515c92ecbf822df8008f0eb2275399909aeedb88e12d1657528d7"
+  },
+  {
+    "path": "backend/src/main/java/com/iitsm/repository/SystemSettingsRepository.java",
+    "sha256": "a68b9bc23d721e2f20ff71a9e770de807ef0e09ecac5bc291a7551ca54bbc374"
+  },
+  {
+    "path": "backend/src/main/java/com/iitsm/repository/TechnicianRepository.java",
+    "sha256": "12663f4fe499bb3e862acdc5f0a30f3ac96b657a517b833f02b9655c173435d7"
+  },
+  {
+    "path": "backend/src/main/java/com/iitsm/repository/UserRepository.java",
+    "sha256": "5b849886f8db8b614a69c028f605c7cf0f3d1688e32ac4aedae310c701bd8494"
+  },
+  {
+    "path": "backend/src/main/java/com/iitsm/scheduler/EmailScheduler.java",
+    "sha256": "55bf10921f1682777a7dfda9c22e3441978a1fe531e539543e253d306abd7610"
+  },
+  {
+    "path": "backend/src/main/java/com/iitsm/scheduler/SlaScheduler.java",
+    "sha256": "4f2a16ace24f7d14a16b13f4b9f23d53435dfe11c133f07e0456b26c29e6cda8"
+  },
+  {
+    "path": "backend/src/main/java/com/iitsm/security/AccessService.java",
+    "sha256": "5f6072d62d054260d4aefaec8ace3536469dda6aa2cbe63988a5b747a1753c51"
+  },
+  {
+    "path": "backend/src/main/java/com/iitsm/security/JwtFilter.java",
+    "sha256": "29a1359cb9ae25e3548239ec48fb2ea4218f98226ad09c25b464d4410df234b9"
+  },
+  {
+    "path": "backend/src/main/java/com/iitsm/security/JwtService.java",
+    "sha256": "9c777303ecf0a445e525c6aa7d55c60578dd8c0b8ef3070443bea3a977be18e2"
+  },
+  {
+    "path": "backend/src/main/java/com/iitsm/security/SecurityConfig.java",
+    "sha256": "58b436962784217622fbddcf9655fd2af709c90817975413cd612806b7bc8cd0"
+  },
+  {
+    "path": "backend/src/main/java/com/iitsm/service/AssignmentService.java",
+    "sha256": "d5d6975cccc243de42d31622dcc06f79ae32a87182e227bde96271e87733eaec"
+  },
+  {
+    "path": "backend/src/main/java/com/iitsm/service/AuthService.java",
+    "sha256": "00f152b50cfa85349edd23a322b0bc929db342ba77ee1f7392973ab7792c9b48"
+  },
+  {
+    "path": "backend/src/main/java/com/iitsm/service/CatalogService.java",
+    "sha256": "08d1a9ed04bc8f5b5a8426ccdd787bb5f895ad64f099ed2572605ce27d56c1d9"
+  },
+  {
+    "path": "backend/src/main/java/com/iitsm/service/ConfigurationService.java",
+    "sha256": "a19f7961cfd254981f6d74c05b109888a23d6a337f57e8f033634c838f45f5c3"
+  },
+  {
+    "path": "backend/src/main/java/com/iitsm/service/DuplicateDetectionService.java",
+    "sha256": "688a03c1dec6d596a29e28ee5b6b47d66377ecb96aba3318a7e4b80ae62ac15a"
+  },
+  {
+    "path": "backend/src/main/java/com/iitsm/service/IncidentChatService.java",
+    "sha256": "eb3139b4f8d4eea37e6ed9f40a0fdd6c5eee23e69a9500b059390899f7e116b3"
+  },
+  {
+    "path": "backend/src/main/java/com/iitsm/service/IncidentEmailService.java",
+    "sha256": "4c7bcb4f4cd976fb6c65eeaaa74132872f3d58f5bab650109d75a116f1bae5b5"
+  },
+  {
+    "path": "backend/src/main/java/com/iitsm/service/IncidentQueryService.java",
+    "sha256": "e17dfe3f8954584ac5d97971ce64b3ac3b6d21c24ce9e8b5a20863abf4242098"
+  },
+  {
+    "path": "backend/src/main/java/com/iitsm/service/IncidentService.java",
+    "sha256": "e4cf68d1a932d8af0c00ab03b8a46fe2147db289e4de132c8da4d12ef56d6d78"
+  },
+  {
+    "path": "backend/src/main/java/com/iitsm/service/NotificationService.java",
+    "sha256": "c44314603e8341f950b595f02b632e8d03647cd43e46d56b04d0bab6e5007db8"
+  },
+  {
+    "path": "backend/src/main/java/com/iitsm/service/PriorityCalculationService.java",
+    "sha256": "1d877a90b38441cfd7fd731f71596e2f3dd04d355482ca0206b02a73d8624ad1"
+  },
+  {
+    "path": "backend/src/main/java/com/iitsm/service/ReportService.java",
+    "sha256": "b3da984b414281c6562ad7b7a7a80e2f92e28b0907a75d4f49ae74b8b08b4edb"
+  },
+  {
+    "path": "backend/src/main/java/com/iitsm/service/SlaMonitoringService.java",
+    "sha256": "3bc2ffba5feef908bfb3e748a196f1d71f7502568a04c24e2320f566e89eee3f"
+  },
+  {
+    "path": "backend/src/main/java/com/iitsm/service/SmtpOutboxService.java",
+    "sha256": "5afe251440f43d4c8a685df1ea5514ec317ba72235529f25500c7cfe14af10b9"
+  },
+  {
+    "path": "backend/src/main/java/com/iitsm/service/UserManagementService.java",
+    "sha256": "23d80ef2d416459943d9ed8341ecd63cd7e76f61ac00cdc8cb8898ad8a6fcc2f"
+  },
+  {
+    "path": "backend/src/main/java/com/iitsm/state/AbstractIncidentState.java",
+    "sha256": "d4c146e954eb2ec078d100d420e95f945527407fb7deb7a686c0e5d90455d30e"
+  },
+  {
+    "path": "backend/src/main/java/com/iitsm/state/AcknowledgedState.java",
+    "sha256": "21657de6cd388c6ec8a0342b8e6a122e649baa05d47e21b35c5f01b16bea45cc"
+  },
+  {
+    "path": "backend/src/main/java/com/iitsm/state/AssignedState.java",
+    "sha256": "81f458aac26a5cc302ecede308cae168db52f666952b4e34d854d8fe93dd9479"
+  },
+  {
+    "path": "backend/src/main/java/com/iitsm/state/ClassifiedState.java",
+    "sha256": "1a8e667b66f928a8128cefe723f0a8ff9a18f800a57899ee4085a44bfbf36bc6"
+  },
+  {
+    "path": "backend/src/main/java/com/iitsm/state/ClosedState.java",
+    "sha256": "51f8ac7604f24e06c601a448326a74936ffb500ff4d8a2525954646f83cdb38f"
+  },
+  {
+    "path": "backend/src/main/java/com/iitsm/state/InProgressState.java",
+    "sha256": "79345b9d22195dbc6a3f5386e13c88c361f780a38687aa85acb8f8c05aa6eb4f"
+  },
+  {
+    "path": "backend/src/main/java/com/iitsm/state/IncidentState.java",
+    "sha256": "eb78e6bf315f4c7957032ef6dfb1f707505a316d9fadba0951ef715c0c2f733e"
+  },
+  {
+    "path": "backend/src/main/java/com/iitsm/state/NewState.java",
+    "sha256": "4528f958483cdb8ddc274cf675483bcde5c9eb99b9f6ca2ec7f570ee0d79cb6d"
+  },
+  {
+    "path": "backend/src/main/java/com/iitsm/state/ResolvedState.java",
+    "sha256": "107ec90ad853a298cb75ff323c624cde10d039702df56fcfc57d719b300c10c6"
+  },
+  {
+    "path": "backend/src/main/java/com/iitsm/state/StateRegistry.java",
+    "sha256": "2b7897540d003577e9d47e8bb35534421894add63ba1ba1ec9e1135ad0215fa0"
+  },
+  {
+    "path": "backend/src/main/java/com/iitsm/state/VerifiedState.java",
+    "sha256": "6d07bed8eef0357bab13b2165cd2c9dae71df368c4a0ba93a8fc98736121e052"
+  },
+  {
+    "path": "backend/src/main/java/com/iitsm/strategy/LoadBasedAssignmentStrategy.java",
+    "sha256": "ca16399e9995149e21f8a84a936193e6649e11d71538922a506b5a3a47e1f59b"
+  },
+  {
+    "path": "backend/src/main/java/com/iitsm/strategy/PriorityStrategy.java",
+    "sha256": "d6e3dbebbd736b9f7d284f723c173986d42d321057a5b8e6c47f15598efbb913"
+  },
+  {
+    "path": "backend/src/main/java/com/iitsm/strategy/RuleBasedPriorityStrategy.java",
+    "sha256": "849da03b0f9e7921690e8fe09c4456a9621136cea68d0f10fcbaf612a1e9fd33"
+  },
+  {
+    "path": "backend/src/main/java/com/iitsm/strategy/SkillBasedAssignmentStrategy.java",
+    "sha256": "c3db50d99b64fbf2f53add52640365dd4f12dd618bc0a6d3873d606a2a5d2828"
+  },
+  {
+    "path": "backend/src/main/java/com/iitsm/strategy/TechnicianAssignmentStrategy.java",
+    "sha256": "9b241e6a1f4aa566db69baa13e9bd96cd5fb735612937dd8ed35427b3598540f"
+  },
+  {
+    "path": "backend/src/main/java/com/iitsm/strategy/WeightedPriorityStrategy.java",
+    "sha256": "e6641e8f4053ef1961b7d3cffbf27e4a04c1fd999af7839e6267eec3798c3691"
+  }
+]

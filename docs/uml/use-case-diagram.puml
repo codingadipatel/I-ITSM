@@ -1,0 +1,93 @@
+@startuml
+!pragma layout smetana
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam defaultFontName SansSerif
+skinparam defaultFontSize 12
+skinparam ArrowColor #6C83AD
+skinparam classBackgroundColor #F4F7FE
+skinparam classBorderColor #9BAFD4
+skinparam actorBorderColor #6C83AD
+skinparam usecaseBackgroundColor #F4F7FE
+skinparam usecaseBorderColor #9BAFD4
+left to right direction
+title I-ITSM — Implemented use cases
+actor Employee as E
+actor Technician as T
+actor Administrator as A
+rectangle "I-ITSM" {
+ usecase "Register / sign in" as Login
+ usecase "Report incident" as Report
+ usecase "Classify and prioritize" as Prioritize
+ usecase "Detect potential duplicates" as Duplicate
+ usecase "Recommend technician" as Recommend
+ usecase "Track incident / add information" as Track
+ usecase "Investigate / add notes" as Investigate
+ usecase "Acknowledge assignment" as Ack
+ usecase "Request information" as Info
+ usecase "Record resolution" as Resolve
+ usecase "Verify resolution" as Verify
+ usecase "Close incident" as Close
+ usecase "Reopen with justification" as Reopen
+ usecase "Provide feedback" as Feedback
+ usecase "Receive / read notifications" as Notify
+ usecase "Chat with reporter / assigned technician" as Chat
+ usecase "Export filtered incidents (CSV / Excel)" as Export
+ usecase "Assign / reassign incident" as Assign
+ usecase "Review duplicate suggestions" as Review
+ usecase "Monitor SLA / escalation" as SLA
+ usecase "Manage technicians and skills" as Tech
+ usecase "Manage users" as Users
+ usecase "Manage services / categories" as Services
+ usecase "Configure SLA / strategies / channels" as Configure
+ usecase "View reports / workload" as Reports
+ usecase "Examine audit trail" as Audit
+}
+E --> Login
+T --> Login
+A --> Login
+E --> Report
+E --> Track
+E --> Chat
+E --> Export
+E --> Verify
+E --> Close
+E --> Feedback
+E --> Reopen
+E --> Notify
+T --> Notify
+A --> Notify
+T --> Ack
+T --> Investigate
+T --> Info
+T --> Resolve
+T --> Review
+T --> Reports
+T --> Track
+T --> Chat
+T --> Export
+A --> Assign
+A --> Review
+A --> SLA
+A --> Tech
+A --> Users
+A --> Services
+A --> Configure
+A --> Reports
+A --> Audit
+A --> Export
+A --> Investigate
+A --> Resolve
+Report ..> Prioritize : <<include>>
+Report ..> Duplicate : <<include>>
+Report ..> Recommend : <<include>>
+Info ..> Investigate : <<extend>>
+Reopen ..> Resolve : <<extend>> [problem persists]
+Feedback ..> Verify : <<extend>> [optional, verified or closed]
+Close ..> Verify : requires prior verification
+note bottom of SLA
+ Scheduled backend monitoring persists warning and breach levels.
+ Admin receives escalations; deadlines use UTC instants.
+end note
+
+@enduml

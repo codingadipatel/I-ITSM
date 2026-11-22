@@ -1,0 +1,206 @@
+@startuml
+!pragma layout smetana
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam defaultFontName SansSerif
+skinparam defaultFontSize 12
+skinparam ArrowColor #6C83AD
+skinparam classBackgroundColor #F4F7FE
+skinparam classBorderColor #9BAFD4
+skinparam actorBorderColor #6C83AD
+skinparam usecaseBackgroundColor #F4F7FE
+skinparam usecaseBorderColor #9BAFD4
+title PostgreSQL ER — actual Flyway schema
+entity "users" as users {
+  id : BIGINT <<PK>>
+  role : VARCHAR
+  email : VARCHAR
+  password_hash : VARCHAR
+  name : VARCHAR
+  active : BOOLEAN
+  created_at : TIMESTAMPTZ
+  available : BOOLEAN
+  max_workload : INTEGER
+  experience_years : INTEGER
+}
+entity "skills" as skills {
+  id : BIGINT <<PK>>
+  name : VARCHAR
+}
+entity "technician_skills" as technician_skills {
+  technician_id : BIGINT <<PK,FK>>
+  skill_id : BIGINT <<PK,FK>>
+}
+entity "services" as services {
+  id : BIGINT <<PK>>
+  name : VARCHAR
+  active : BOOLEAN
+  criticality : INTEGER
+  required_skill : VARCHAR
+}
+entity "incident_categories" as incident_categories {
+  id : BIGINT <<PK>>
+  name : VARCHAR
+  active : BOOLEAN
+  required_skill : VARCHAR
+}
+entity "sla_policies" as sla_policies {
+  id : BIGINT <<PK>>
+  priority : VARCHAR
+  response_minutes : INTEGER
+  resolution_minutes : INTEGER
+}
+entity "system_settings" as system_settings {
+  id : BIGINT <<PK>>
+  assignment_strategy : VARCHAR
+  priority_strategy : VARCHAR
+  p1threshold : DOUBLE PRECISION
+  p2threshold : DOUBLE PRECISION
+  p3threshold : DOUBLE PRECISION
+  email_enabled : BOOLEAN
+}
+entity "incidents" as incidents {
+  id : BIGINT <<PK>>
+  version : BIGINT
+  title : VARCHAR
+  description : TEXT
+  reporter_id : BIGINT <<FK>>
+  technician_id : BIGINT <<FK>>
+  service_id : BIGINT <<FK>>
+  category_id : BIGINT <<FK>>
+  sla_policy_id : BIGINT <<FK>>
+  impact : INTEGER
+  urgency : INTEGER
+  affected_users : INTEGER
+  priority_score : DOUBLE PRECISION
+  priority : VARCHAR
+  priority_reason : VARCHAR
+  assignment_reason : VARCHAR
+  status : VARCHAR
+  created_at : TIMESTAMPTZ
+  updated_at : TIMESTAMPTZ
+  response_deadline : TIMESTAMPTZ
+  resolution_deadline : TIMESTAMPTZ
+  acknowledged_at : TIMESTAMPTZ
+  resolved_at : TIMESTAMPTZ
+  verified_at : TIMESTAMPTZ
+  closed_at : TIMESTAMPTZ
+  response_violated : BOOLEAN
+  resolution_violated : BOOLEAN
+  warning_level : VARCHAR
+  resolution_details : TEXT
+  verification_details : TEXT
+}
+entity "incident_notes" as incident_notes {
+  id : BIGINT <<PK>>
+  incident_id : BIGINT <<FK>>
+  author_id : BIGINT <<FK>>
+  content : TEXT
+  information_request : BOOLEAN
+  created_at : TIMESTAMPTZ
+}
+entity "incident_assignments" as incident_assignments {
+  id : BIGINT <<PK>>
+  incident_id : BIGINT <<FK>>
+  technician_id : BIGINT <<FK>>
+  assigned_by_id : BIGINT <<FK>>
+  reason : VARCHAR
+  created_at : TIMESTAMPTZ
+}
+entity "audit_logs" as audit_logs {
+  id : BIGINT <<PK>>
+  incident_id : BIGINT <<FK>>
+  actor_id : BIGINT <<FK>>
+  action : VARCHAR
+  previous_state : VARCHAR
+  new_state : VARCHAR
+  description : TEXT
+  created_at : TIMESTAMPTZ
+}
+entity "feedback" as feedback {
+  id : BIGINT <<PK>>
+  incident_id : BIGINT <<FK>>
+  rating : INTEGER
+  comment : TEXT
+  created_at : TIMESTAMPTZ
+}
+entity "duplicate_suggestions" as duplicate_suggestions {
+  id : BIGINT <<PK>>
+  incident_id : BIGINT <<FK>>
+  related_id : BIGINT <<FK>>
+  score : DOUBLE PRECISION
+  decision : VARCHAR
+  reviewed_by_id : BIGINT <<FK>>
+  reviewed_at : TIMESTAMPTZ
+}
+entity "notifications" as notifications {
+  id : BIGINT <<PK>>
+  recipient_id : BIGINT <<FK>>
+  incident_id : BIGINT <<FK>>
+  event_type : VARCHAR
+  message : TEXT
+  read : BOOLEAN
+  created_at : TIMESTAMPTZ
+}
+entity "email_outbox" as email_outbox {
+  id : BIGINT <<PK>>
+  recipient : VARCHAR
+  subject : VARCHAR
+  body : TEXT
+  delivery_status : VARCHAR
+  created_at : TIMESTAMPTZ
+  deduplication_key : TEXT <<UNIQUE>>
+  attempts : INTEGER
+  next_attempt_at : TIMESTAMPTZ
+  expires_at : TIMESTAMPTZ
+  sent_at : TIMESTAMPTZ
+}
+entity "incident_chat_messages" as chat {
+  id : BIGINT <<PK>>
+  incident_id : BIGINT <<FK>>
+  technician_id : BIGINT <<FK>>
+  sender_id : BIGINT <<FK>>
+  body : TEXT
+  sent_at : TIMESTAMPTZ
+  source_notification_id : BIGINT <<FK,nullable>>
+}
+incidents ||--o{ chat : incident_id
+users ||--o{ chat : technician_id
+users ||--o{ chat : sender_id
+notifications |o--o{ chat : source_notification_id
+users ||--o{ technician_skills : technician_id
+skills ||--o{ technician_skills : skill_id
+users ||--o{ incidents : reporter_id
+users ||--o{ incidents : technician_id
+services ||--o{ incidents : service_id
+incident_categories ||--o{ incidents : category_id
+sla_policies ||--o{ incidents : sla_policy_id
+incidents ||--o{ incident_notes : incident_id
+users ||--o{ incident_notes : author_id
+incidents ||--o{ incident_assignments : incident_id
+users ||--o{ incident_assignments : technician_id
+users ||--o{ incident_assignments : assigned_by_id
+incidents ||--o{ audit_logs : incident_id
+users ||--o{ audit_logs : actor_id
+incidents ||--o| feedback : incident_id
+incidents ||--o{ duplicate_suggestions : incident_id
+incidents ||--o{ duplicate_suggestions : related_id
+users ||--o{ duplicate_suggestions : reviewed_by_id
+users ||--o{ notifications : recipient_id
+incidents ||--o{ notifications : incident_id
+note bottom of users
+ Single-table user inheritance by role discriminator.
+ Nullable technician columns apply only to TECHNICIAN rows.
+ Technician skills use a composite primary key join table.
+end note
+note bottom of incidents
+ SlaTracking is embedded: all deadlines, acknowledgements,
+ breach flags and levels are stored in incidents.
+ version supplies optimistic concurrency control.
+end note
+note bottom of audit_logs
+ Database trigger rejects UPDATE and DELETE.
+ No application endpoint edits or removes audit history.
+end note
+
+@enduml

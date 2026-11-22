@@ -1,0 +1,47 @@
+server:
+  port: ${PORT:8080}
+spring:
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/iitsm}
+    username: ${DB_USER:iitsm}
+    password: ${DB_PASSWORD}
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        jdbc.time_zone: UTC
+  mail:
+    host: ${SMTP_HOST:}
+    port: ${SMTP_PORT:587}
+    username: ${SMTP_USERNAME:}
+    password: ${SMTP_PASSWORD:}
+    properties:
+      "[mail.smtp.auth]": ${SMTP_AUTH:true}
+      "[mail.smtp.starttls.enable]": ${SMTP_STARTTLS:true}
+      "[mail.smtp.starttls.required]": ${SMTP_STARTTLS:true}
+      "[mail.smtp.ssl.checkserveridentity]": true
+      "[mail.smtp.connectiontimeout]": 5000
+      "[mail.smtp.timeout]": 5000
+      "[mail.smtp.writetimeout]": 5000
+  task:
+    scheduling:
+      pool:
+        size: 2
+  jackson:
+    time-zone: UTC
+  mvc:
+    problemdetails:
+      enabled: true
+app:
+  jwt-secret: ${JWT_SECRET}
+  cors-origins: ${CORS_ORIGINS:http://localhost:5173}
+  demo-enabled: ${DEMO_ENABLED:false}
+  demo-password: ${DEMO_PASSWORD:}
+  email-recipient-overrides: ${EMAIL_RECIPIENT_OVERRIDES:}
+  smtp-from: ${SMTP_FROM:${SMTP_USERNAME:}}
+  sla-interval-ms: ${SLA_INTERVAL_MS:30000}
+logging:
+  level:
+    org.springframework.security: WARN

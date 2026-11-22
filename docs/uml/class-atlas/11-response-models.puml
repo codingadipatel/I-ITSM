@@ -1,0 +1,166 @@
+@startuml
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam defaultFontName SansSerif
+skinparam defaultFontSize 14
+skinparam classFontSize 16
+skinparam classAttributeFontSize 13
+skinparam classBorderColor #69839D
+skinparam ArrowColor #526B83
+skinparam packageBorderColor #B4C2CF
+skinparam packageBackgroundColor #FAFCFE
+skinparam classAttributeIconSize 0
+skinparam linetype polyline
+skinparam nodesep 35
+skinparam ranksep 55
+hide empty members
+
+title I-ITSM | Response DTOs and view composition
+caption Source snapshot: 22 November 2026 | com.iitsm backend | Explicit members; generated accessors omitted
+package "dto" {
+class "Views" as Views #F0EDFA {
+}
+class "Views.Audit" as Views_Audit <<record>> #F0EDFA {
+ -id : Long
+ -incidentId : Long
+ -actor : String
+ -action : String
+ -previousState : String
+ -newState : String
+ -description : String
+ -createdAt : Instant
+}
+class "Views.Auth" as Views_Auth <<record>> #F0EDFA {
+ -token : String
+ -user : UserView
+}
+class "Views.Catalog" as Views_Catalog <<record>> #F0EDFA {
+ -id : Long
+ -name : String
+ -active : boolean
+ -criticality : int
+ -requiredSkill : String
+}
+class "Views.DetailView" as Views_DetailView <<record>> #F0EDFA {
+ -incident : IncidentView
+ -notes : List<Note>
+ -history : List<Audit>
+ -duplicates : List<Duplicate>
+ -feedback : Map<String, Object>
+}
+class "Views.Duplicate" as Views_Duplicate <<record>> #F0EDFA {
+ -id : Long
+ -incidentId : Long
+ -relatedId : Long
+ -relatedTitle : String
+ -score : double
+ -decision : String
+}
+class "Views.IncidentView" as Views_IncidentView <<record>> #F0EDFA {
+ -id : Long
+ -version : long
+ -title : String
+ -description : String
+ -reporter : UserView
+ -technician : UserView
+ -service : Catalog
+ -category : Catalog
+ -impact : int
+ -urgency : int
+ -affectedUsers : int
+ -priority : Priority
+ -priorityScore : double
+ -priorityReason : String
+ -assignmentReason : String
+ -status : Status
+ -createdAt : Instant
+ -updatedAt : Instant
+ -responseDeadline : Instant
+ -resolutionDeadline : Instant
+ -acknowledgedAt : Instant
+ -resolvedAt : Instant
+ -verifiedAt : Instant
+ -closedAt : Instant
+ -resolutionDetails : String
+ -verificationDetails : String
+ -slaLevel : SlaLevel
+ -responseViolated : boolean
+ -resolutionViolated : boolean
+}
+class "Views.Note" as Views_Note <<record>> #F0EDFA {
+ -id : Long
+ -author : UserView
+ -content : String
+ -informationRequest : boolean
+ -createdAt : Instant
+}
+class "Views.NotificationConversation" as Views_NotificationConversation <<record>> #F0EDFA {
+ -technicianId : long
+ -participantName : String
+ -canReply : boolean
+}
+class "Views.NotificationView" as Views_NotificationView <<record>> #F0EDFA {
+ -id : Long
+ -incidentId : Long
+ -eventType : String
+ -message : String
+ -read : boolean
+ -createdAt : Instant
+ -conversation : NotificationConversation
+}
+class "Views.Recommendation" as Views_Recommendation <<record>> #F0EDFA {
+ -technicianId : Long
+ -technicianName : String
+ -reason : String
+ -score : double
+}
+class "Views.UserView" as Views_UserView <<record>> #F0EDFA {
+ -id : Long
+ -name : String
+ -email : String
+ -role : Role
+ -active : boolean
+ -available : boolean
+ -maxWorkload : int
+ -experienceYears : int
+ -skills : Set<String>
+}
+}
+package "model" {
+enum "Priority" as Priority #EDF2F7 {
+}
+enum "Role" as Role #EDF2F7 {
+}
+enum "SlaLevel" as SlaLevel #EDF2F7 {
+}
+enum "Status" as Status #EDF2F7 {
+}
+}
+Views_UserView --> Role : role
+Views_Auth --> Views_UserView : user
+Views_IncidentView --> Views_UserView : reporter
+Views_IncidentView --> Views_UserView : technician
+Views_IncidentView --> Views_Catalog : service
+Views_IncidentView --> Views_Catalog : category
+Views_IncidentView --> Priority : priority
+Views_IncidentView --> Status : status
+Views_IncidentView --> SlaLevel : slaLevel
+Views_Note --> Views_UserView : author
+Views_NotificationView --> Views_NotificationConversation : conversation
+Views_DetailView --> Views_IncidentView : incident
+Views_DetailView --> Views_Note : notes
+Views_DetailView --> Views_Audit : history
+Views_DetailView --> Views_Duplicate : duplicates
+legend bottom left
+DESIGN NOTES
+IncidentView includes reporter/technician views, classification, calculated priority and reasons,
+all lifecycle timestamps, SLA deadlines/violations and resolution/verification details.
+ViewMapper performs entity-to-view mapping. Password hashes are excluded from UserView.
+
+NOTATION
++ public   # protected   - private   ~ package
+Solid hollow triangle: inheritance | Dashed hollow triangle: interface realization
+Filled diamond: composition | Hollow diamond: shared aggregation
+Arrow: stored association | Dashed arrow: dependency
+endlegend
+@enduml

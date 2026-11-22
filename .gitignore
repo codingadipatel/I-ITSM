@@ -1,0 +1,14 @@
+**/node_modules/
+**/target/
+**/dist/
+.env
+.env.*
+!.env.example
+.runtime/
+*.log
+.DS_Store
+**/*.tsbuildinfo
+DEMO-CREDENTIALS.local.md
+
+# Local editor configuration
+.vscode/

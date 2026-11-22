@@ -1,0 +1,18 @@
+# Concrete OOP mapping
+
+| Principle | Actual implementation and purpose |
+| --- | --- |
+| Encapsulation | Incident fields are private and have no public setters. `revise`, `prioritize`, `assign`, `transition`, `resolve`, `verify` and `reopen` control changes. `Technician.configure`, `SlaPolicy.configure`, `SystemSettings.configure` and `Feedback` validate domain constraints. Lombok supplies getters/protected JPA constructors, not mutable-field exposure. |
+| Abstraction | PriorityStrategy, TechnicianAssignmentStrategy, IncidentState, IncidentEventListener and NotificationChannel define contracts for calculations, routing, state policy and delivery. |
+| Inheritance | Employee, Technician and Administrator are User subtypes with concrete getRole methods and JPA single-table persistence. Technician adds genuine subtype behavior. ServiceItem and IncidentCategory share CatalogItem's identity/name/status. Concrete lifecycle states share AbstractIncidentState validation. |
+| Polymorphism | PriorityCalculationService invokes calculate through PriorityStrategy; AssignmentService invokes recommend through TechnicianAssignmentStrategy. Incident delegates transition through IncidentState. Publisher calls each IncidentEventListener, and delivery uses NotificationChannel. No algorithm-specific type switches appear in incident orchestration. |
+| Composition | Incident constructs and owns its embedded SlaTracking component. A persisted tracking component has no independent identity or lifecycle. |
+| Association | Incident references its reporter, current technician, reusable service/category and SLA policy. Notes associate author and incident; assignments associate incident/technician/actor; feedback references one incident. |
+| Aggregation | Technician maintains a Set of shared Skill entities. Skills exist independently and can be shared by technicians; no removal cascade deletes them. StateRegistry and IncidentEventPublisher aggregate injected strategy/state/listener objects rather than own their persistence. |
+| Interfaces | Spring Data repositories, strategy/state/observer/channel contracts and their implementations express precise substitutable responsibilities. |
+| Exceptions | AppException carries an HTTP status for typed IncidentNotFoundException, InvalidIncidentStateException, TechnicianUnavailableException, WorkloadExceededException, ServiceNotFoundException, SLAConfigurationNotFoundException and UnauthorizedOperationException. GlobalExceptionHandler maps validation/conflict/access/domain failures consistently. |
+| Collections/data structures | HashSet/Set for unique skills and text tokens; EnumMap for lifecycle states; maps for strategy lookup and de-duplicated notification recipients; ordered lists for event observers and chronological history; immutable successor sets; JPA pages for bounded incident listings. |
+
+Inheritance represents actual user-role identity, while most variability is modeled with composition and interfaces. The one subtype check in ViewMapper/UserManagementService extracts technician-specific fields; it does not select priority or assignment behavior. DTO records are immutable transport models. Private fields are not exposed as JPA entities to frontend consumers except explicitly safe configuration/policy records and email delivery records.
+
+For an oral defense: follow `IncidentController.create → IncidentService.create → PriorityCalculationService / DuplicateDetectionService / AssignmentService → IncidentEventPublisher → AuditObserver / NotificationObserver → repositories`. Then show `Incident.transition` and the eight state classes to explain why an invalid transition cannot commit.

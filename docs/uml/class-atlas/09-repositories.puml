@@ -1,0 +1,148 @@
+@startuml
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam defaultFontName SansSerif
+skinparam defaultFontSize 14
+skinparam classFontSize 16
+skinparam classAttributeFontSize 13
+skinparam classBorderColor #69839D
+skinparam ArrowColor #526B83
+skinparam packageBorderColor #B4C2CF
+skinparam packageBackgroundColor #FAFCFE
+skinparam classAttributeIconSize 0
+skinparam linetype polyline
+skinparam nodesep 35
+skinparam ranksep 55
+hide empty members
+
+title I-ITSM | All Spring Data repository interfaces
+caption Source snapshot: 22 November 2026 | com.iitsm backend | Explicit members; generated accessors omitted
+package "repository" {
+interface "AssignmentRepository" as AssignmentRepository #EAF4EE {
+ +findByIncidentIdOrderByCreatedAtAsc(id: Long) : java.util.List<Assignment>
+}
+interface "AuditLogRepository" as AuditLogRepository #EAF4EE {
+ +findByIncidentIdOrderByCreatedAtAsc(id: Long) : java.util.List<AuditLog>
+}
+interface "DuplicateSuggestionRepository" as DuplicateSuggestionRepository #EAF4EE {
+ +findByIncidentIdOrRelatedId(incidentId: Long, relatedId: Long) : java.util.List<DuplicateSuggestion>
+}
+interface "EmailMessageRepository" as EmailMessageRepository #EAF4EE {
+}
+interface "FeedbackRepository" as FeedbackRepository #EAF4EE {
+ +findByIncidentId(id: Long) : java.util.Optional<Feedback>
+}
+interface "IncidentCategoryRepository" as IncidentCategoryRepository #EAF4EE {
+}
+interface "IncidentNoteRepository" as IncidentNoteRepository #EAF4EE {
+ +findByIncidentIdOrderByCreatedAtAsc(id: Long) : java.util.List<IncidentNote>
+}
+interface "IncidentRepository" as IncidentRepository #EAF4EE {
+ +findByCreatedAtAfter(date: java.time.Instant) : java.util.List<Incident>
+ +findLockedById(id: Long) : java.util.Optional<Incident>
+ +countByTechnicianIdAndCategoryIdAndStatusIn(technicianId: Long, categoryId: Long, statuses: java.util.Collection<com.iitsm.model.Status>) : long
+ +countByTechnicianIdAndStatusNotIn(id: Long, statuses: java.util.Collection<com.iitsm.model.Status>) : long
+}
+interface "NotificationRepository" as NotificationRepository #EAF4EE {
+ +findByRecipientIdOrderByCreatedAtDesc(id: Long) : java.util.List<Notification>
+}
+interface "ServiceItemRepository" as ServiceItemRepository #EAF4EE {
+}
+interface "SkillRepository" as SkillRepository #EAF4EE {
+ +findByNameIgnoreCase(name: String) : java.util.Optional<Skill>
+}
+interface "SlaPolicyRepository" as SlaPolicyRepository #EAF4EE {
+ +findByPriority(priority: com.iitsm.model.Priority) : java.util.Optional<SlaPolicy>
+}
+interface "SystemSettingsRepository" as SystemSettingsRepository #EAF4EE {
+}
+interface "TechnicianRepository" as TechnicianRepository #EAF4EE {
+ +findLockedById(id: Long) : java.util.Optional<Technician>
+}
+interface "UserRepository" as UserRepository #EAF4EE {
+ +findByEmailIgnoreCase(email: String) : java.util.Optional<User>
+ +existsByEmailIgnoreCase(email: String) : boolean
+}
+}
+AssignmentRepository -[hidden]right-> AuditLogRepository
+AssignmentRepository -[hidden]down-> EmailMessageRepository
+AuditLogRepository -[hidden]right-> DuplicateSuggestionRepository
+AuditLogRepository -[hidden]down-> FeedbackRepository
+DuplicateSuggestionRepository -[hidden]down-> IncidentCategoryRepository
+EmailMessageRepository -[hidden]right-> FeedbackRepository
+EmailMessageRepository -[hidden]down-> IncidentNoteRepository
+FeedbackRepository -[hidden]right-> IncidentCategoryRepository
+FeedbackRepository -[hidden]down-> IncidentRepository
+IncidentCategoryRepository -[hidden]down-> NotificationRepository
+IncidentNoteRepository -[hidden]right-> IncidentRepository
+IncidentNoteRepository -[hidden]down-> ServiceItemRepository
+IncidentRepository -[hidden]right-> NotificationRepository
+IncidentRepository -[hidden]down-> SkillRepository
+NotificationRepository -[hidden]down-> SlaPolicyRepository
+ServiceItemRepository -[hidden]right-> SkillRepository
+ServiceItemRepository -[hidden]down-> SystemSettingsRepository
+SkillRepository -[hidden]right-> SlaPolicyRepository
+SkillRepository -[hidden]down-> TechnicianRepository
+SlaPolicyRepository -[hidden]down-> UserRepository
+SystemSettingsRepository -[hidden]right-> TechnicianRepository
+TechnicianRepository -[hidden]right-> UserRepository
+note right of AssignmentRepository
+extends JpaRepository<Assignment, Long>
+end note
+note right of AuditLogRepository
+extends JpaRepository<AuditLog, Long>
+end note
+note right of DuplicateSuggestionRepository
+extends JpaRepository<DuplicateSuggestion, Long>
+end note
+note right of EmailMessageRepository
+extends JpaRepository<EmailMessage, Long>
+end note
+note right of FeedbackRepository
+extends JpaRepository<Feedback, Long>
+end note
+note right of IncidentCategoryRepository
+extends JpaRepository<IncidentCategory, Long>
+end note
+note right of IncidentNoteRepository
+extends JpaRepository<IncidentNote, Long>
+end note
+note right of IncidentRepository
+extends JpaRepository<Incident, Long>
+extends JpaSpecificationExecutor<Incident>
+end note
+note right of NotificationRepository
+extends JpaRepository<Notification, Long>
+end note
+note right of ServiceItemRepository
+extends JpaRepository<ServiceItem, Long>
+end note
+note right of SkillRepository
+extends JpaRepository<Skill, Long>
+end note
+note right of SlaPolicyRepository
+extends JpaRepository<SlaPolicy, Long>
+end note
+note right of SystemSettingsRepository
+extends JpaRepository<SystemSettings, Long>
+end note
+note right of TechnicianRepository
+extends JpaRepository<Technician, Long>
+end note
+note right of UserRepository
+extends JpaRepository<User, Long>
+end note
+legend bottom left
+DESIGN NOTES
+All 15 interfaces extend JpaRepository<Entity, Long>.
+IncidentRepository additionally extends JpaSpecificationExecutor<Incident>.
+Framework superinterfaces are named in each repository note below.
+Runtime Spring Data proxies provide inherited CRUD methods; they are not copied into each interface.
+
+NOTATION
++ public   # protected   - private   ~ package
+Solid hollow triangle: inheritance | Dashed hollow triangle: interface realization
+Filled diamond: composition | Hollow diamond: shared aggregation
+Arrow: stored association | Dashed arrow: dependency
+endlegend
+@enduml

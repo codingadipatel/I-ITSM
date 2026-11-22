@@ -1,0 +1,45 @@
+@startuml
+!pragma layout smetana
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam defaultFontName SansSerif
+skinparam defaultFontSize 12
+skinparam ArrowColor #6C83AD
+skinparam classBackgroundColor #F4F7FE
+skinparam classBorderColor #9BAFD4
+skinparam actorBorderColor #6C83AD
+skinparam usecaseBackgroundColor #F4F7FE
+skinparam usecaseBorderColor #9BAFD4
+title Deployment — Docker Compose (local-only port bindings)
+node "User browser" {
+ artifact "React application" as React
+}
+node "Docker host" {
+ node "frontend container\nNginx :80" as Nginx {
+  artifact "Vite production build" as Static
+ }
+ node "backend container\nTemurin Java 21 :8080" as Backend {
+  artifact "Spring Boot executable JAR" as Jar
+  component "JWT / RBAC" as Auth
+  component "SLA scheduler" as SLA
+  component "SMTP outbox worker" as Mail
+ }
+ node "db container\nPostgreSQL 17 :5432" as Postgres {
+  database "iitsm" as DB
+ }
+ folder "postgres-data named volume" as Volume
+}
+cloud "Configured SMTP server" as SMTP
+Mail --> SMTP : authenticated SMTP / STARTTLS
+React --> Nginx : http://localhost:5173\nstatic + same-origin /api
+Nginx --> Backend : /api reverse proxy
+Backend --> Postgres : JDBC / internal network
+Postgres --> Volume : durable files
+note bottom of Nginx
+ Local development alternative: Vite :5173 proxies to Java :8080;
+ scripts/local-db.sh starts PostgreSQL on loopback :55432.
+ .env supplies all secrets. Production requires TLS termination,
+ backups, operational monitoring and configured SMTP delivery.
+end note
+
+@enduml

@@ -1,0 +1,476 @@
+{
+  "verified_date": "2026-11-22",
+  "input_archive_sha256": "b02f98e2daad0c62737caf5ff95152c16565a80acb4fc51365314fc76cc68999",
+  "scope": "Fresh extraction of the exact GitHub-ready source ZIP; isolated databases; no live account mutations",
+  "backend": {
+    "runtime": "Amazon Corretto 21.0.13.1",
+    "command": "mvn clean verify",
+    "passed": 53,
+    "failures": 0
+  },
+  "frontend": {
+    "fresh_npm_ci": true,
+    "tests_passed": 8,
+    "production_build_passed": true
+  },
+  "live_api": {
+    "passed_requests": 58,
+    "main_incident_id": 7,
+    "final_status": "CLOSED",
+    "feedback_rating": 5,
+    "audit_events": 15,
+    "checks": [
+      {
+        "method": "GET",
+        "endpoint": "/health",
+        "expected_status": 200,
+        "passed": true
+      },
+      {
+        "method": "GET",
+        "endpoint": "/incidents",
+        "expected_status": 401,
+        "passed": true
+      },
+      {
+        "method": "POST",
+        "endpoint": "/auth/login",
+        "expected_status": 401,
+        "passed": true
+      },
+      {
+        "method": "POST",
+        "endpoint": "/auth/login",
+        "expected_status": 200,
+        "passed": true
+      },
+      {
+        "method": "POST",
+        "endpoint": "/auth/login",
+        "expected_status": 200,
+        "passed": true
+      },
+      {
+        "method": "POST",
+        "endpoint": "/auth/login",
+        "expected_status": 200,
+        "passed": true
+      },
+      {
+        "method": "POST",
+        "endpoint": "/auth/register",
+        "expected_status": 201,
+        "passed": true
+      },
+      {
+        "method": "GET",
+        "endpoint": "/users",
+        "expected_status": 200,
+        "passed": true
+      },
+      {
+        "method": "GET",
+        "endpoint": "/technicians",
+        "expected_status": 200,
+        "passed": true
+      },
+      {
+        "method": "GET",
+        "endpoint": "/services",
+        "expected_status": 200,
+        "passed": true
+      },
+      {
+        "method": "GET",
+        "endpoint": "/categories",
+        "expected_status": 200,
+        "passed": true
+      },
+      {
+        "method": "GET",
+        "endpoint": "/sla/policies",
+        "expected_status": 200,
+        "passed": true
+      },
+      {
+        "method": "GET",
+        "endpoint": "/settings",
+        "expected_status": 200,
+        "passed": true
+      },
+      {
+        "method": "GET",
+        "endpoint": "/reports/overview",
+        "expected_status": 200,
+        "passed": true
+      },
+      {
+        "method": "GET",
+        "endpoint": "/reports/technician-workload",
+        "expected_status": 200,
+        "passed": true
+      },
+      {
+        "method": "GET",
+        "endpoint": "/reports/category-analysis",
+        "expected_status": 200,
+        "passed": true
+      },
+      {
+        "method": "GET",
+        "endpoint": "/reports/service-analysis",
+        "expected_status": 200,
+        "passed": true
+      },
+      {
+        "method": "GET",
+        "endpoint": "/reports/incident-trends",
+        "expected_status": 200,
+        "passed": true
+      },
+      {
+        "method": "GET",
+        "endpoint": "/audit-logs",
+        "expected_status": 200,
+        "passed": true
+      },
+      {
+        "method": "GET",
+        "endpoint": "/email-outbox",
+        "expected_status": 200,
+        "passed": true
+      },
+      {
+        "method": "GET",
+        "endpoint": "/sla/violations",
+        "expected_status": 200,
+        "passed": true
+      },
+      {
+        "method": "GET",
+        "endpoint": "/users",
+        "expected_status": 403,
+        "passed": true
+      },
+      {
+        "method": "GET",
+        "endpoint": "/services",
+        "expected_status": 200,
+        "passed": true
+      },
+      {
+        "method": "GET",
+        "endpoint": "/categories",
+        "expected_status": 200,
+        "passed": true
+      },
+      {
+        "method": "POST",
+        "endpoint": "/incidents",
+        "expected_status": 201,
+        "passed": true
+      },
+      {
+        "method": "POST",
+        "endpoint": "/auth/login",
+        "expected_status": 200,
+        "passed": true
+      },
+      {
+        "method": "GET",
+        "endpoint": "/incidents/7",
+        "expected_status": 403,
+        "passed": true
+      },
+      {
+        "method": "PUT",
+        "endpoint": "/incidents/7",
+        "expected_status": 200,
+        "passed": true
+      },
+      {
+        "method": "POST",
+        "endpoint": "/incidents/7/close",
+        "expected_status": 409,
+        "passed": true
+      },
+      {
+        "method": "POST",
+        "endpoint": "/incidents/7/notes",
+        "expected_status": 201,
+        "passed": true
+      },
+      {
+        "method": "POST",
+        "endpoint": "/incidents/7/chat",
+        "expected_status": 201,
+        "passed": true
+      },
+      {
+        "method": "GET",
+        "endpoint": "/incidents/7/chat?technicianId=4",
+        "expected_status": 200,
+        "passed": true
+      },
+      {
+        "method": "POST",
+        "endpoint": "/incidents/7/acknowledge",
+        "expected_status": 200,
+        "passed": true
+      },
+      {
+        "method": "POST",
+        "endpoint": "/incidents/7/investigate",
+        "expected_status": 200,
+        "passed": true
+      },
+      {
+        "method": "POST",
+        "endpoint": "/incidents/7/notes",
+        "expected_status": 201,
+        "passed": true
+      },
+      {
+        "method": "POST",
+        "endpoint": "/incidents/7/request-information",
+        "expected_status": 200,
+        "passed": true
+      },
+      {
+        "method": "GET",
+        "endpoint": "/notifications",
+        "expected_status": 200,
+        "passed": true
+      },
+      {
+        "method": "POST",
+        "endpoint": "/notifications/45/reply",
+        "expected_status": 201,
+        "passed": true
+      },
+      {
+        "method": "PATCH",
+        "endpoint": "/notifications/45/read",
+        "expected_status": 200,
+        "passed": true
+      },
+      {
+        "method": "GET",
+        "endpoint": "/incidents/7/chat?technicianId=4",
+        "expected_status": 200,
+        "passed": true
+      },
+      {
+        "method": "GET",
+        "endpoint": "/technicians/4/workload",
+        "expected_status": 200,
+        "passed": true
+      },
+      {
+        "method": "POST",
+        "endpoint": "/incidents",
+        "expected_status": 201,
+        "passed": true
+      },
+      {
+        "method": "GET",
+        "endpoint": "/incidents/8",
+        "expected_status": 200,
+        "passed": true
+      },
+      {
+        "method": "POST",
+        "endpoint": "/incidents/8/duplicates/1",
+        "expected_status": 200,
+        "passed": true
+      },
+      {
+        "method": "GET",
+        "endpoint": "/settings",
+        "expected_status": 200,
+        "passed": true
+      },
+      {
+        "method": "PUT",
+        "endpoint": "/settings",
+        "expected_status": 200,
+        "passed": true
+      },
+      {
+        "method": "POST",
+        "endpoint": "/incidents",
+        "expected_status": 201,
+        "passed": true
+      },
+      {
+        "method": "PUT",
+        "endpoint": "/settings",
+        "expected_status": 200,
+        "passed": true
+      },
+      {
+        "method": "POST",
+        "endpoint": "/incidents/7/resolve",
+        "expected_status": 200,
+        "passed": true
+      },
+      {
+        "method": "POST",
+        "endpoint": "/incidents/7/verify",
+        "expected_status": 200,
+        "passed": true
+      },
+      {
+        "method": "POST",
+        "endpoint": "/incidents/7/close",
+        "expected_status": 200,
+        "passed": true
+      },
+      {
+        "method": "POST",
+        "endpoint": "/incidents/7/feedback",
+        "expected_status": 201,
+        "passed": true
+      },
+      {
+        "method": "POST",
+        "endpoint": "/incidents/7/chat",
+        "expected_status": 409,
+        "passed": true
+      },
+      {
+        "method": "GET",
+        "endpoint": "/incidents/7",
+        "expected_status": 200,
+        "passed": true
+      },
+      {
+        "method": "GET",
+        "endpoint": "/incidents?q=Final%20check&priority=P1&status=CLOSED&serviceId=1&categoryId=1&technicianId=4",
+        "expected_status": 200,
+        "passed": true
+      },
+      {
+        "method": "GET",
+        "endpoint": "/incidents/export?q=Final%20check",
+        "expected_status": 200,
+        "passed": true
+      },
+      {
+        "method": "GET",
+        "endpoint": "/reports/comparison?period=week&date=2026-11-22",
+        "expected_status": 200,
+        "passed": true
+      },
+      {
+        "method": "POST",
+        "endpoint": "/incidents",
+        "expected_status": 400,
+        "passed": true
+      }
+    ]
+  },
+  "browser": {
+    "roles_verified": [
+      "EMPLOYEE",
+      "TECHNICIAN",
+      "ADMIN"
+    ],
+    "admin_pages_verified": [
+      "users",
+      "technicians",
+      "services",
+      "categories",
+      "sla",
+      "automation",
+      "reports",
+      "audit",
+      "notification-settings",
+      "workload"
+    ],
+    "technician_controls": [
+      "acknowledge",
+      "request information",
+      "workload"
+    ],
+    "employee_evidence": "Closed incident with resolution, verified status and five-star feedback",
+    "console_errors_observed": 0
+  },
+  "restart_persistence": {
+    "passed": true,
+    "before": {
+      "incidents": 9,
+      "users": 8,
+      "notes": 3,
+      "chat": 2,
+      "feedback": 1,
+      "duplicates": 1,
+      "audits": 53,
+      "main_status": "CLOSED",
+      "main_rating": 5
+    },
+    "after": {
+      "incidents": 9,
+      "users": 8,
+      "notes": 3,
+      "chat": 2,
+      "feedback": 1,
+      "duplicates": 1,
+      "audits": 53,
+      "main_status": "CLOSED",
+      "main_rating": 5
+    }
+  },
+  "uml": {
+    "sources_rendered": 21,
+    "declared_java_types": 139,
+    "source_files": 107
+  },
+  "dependency_audit": {
+    "full": {
+      "info": 0,
+      "low": 0,
+      "moderate": 3,
+      "high": 0,
+      "critical": 2,
+      "total": 5
+    },
+    "production_only": {
+      "info": 0,
+      "low": 0,
+      "moderate": 2,
+      "high": 0,
+      "critical": 0,
+      "total": 2
+    },
+    "affected_packages": {
+      "@vitest/mocker": {
+        "severity": "moderate",
+        "direct": false
+      },
+      "exceljs": {
+        "severity": "moderate",
+        "direct": true
+      },
+      "tinypool": {
+        "severity": "critical",
+        "direct": false
+      },
+      "uuid": {
+        "severity": "moderate",
+        "direct": false
+      },
+      "vitest": {
+        "severity": "critical",
+        "direct": true
+      }
+    },
+    "packages_changed": false
+  },
+  "limits": [
+    "Docker CLI unavailable: images not built or run",
+    "SMTP configured off in isolated verification: Gmail delivery not tested",
+    "Dependency findings remain; no major dependency upgrades made",
+    "ExcelJS output chunk exceeds 500 kB build warning threshold"
+  ]
+}
